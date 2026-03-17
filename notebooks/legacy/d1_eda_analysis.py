@@ -10,14 +10,29 @@
 # ---
 
 # %%
-import d0_data_preprocessing as d0
+from pathlib import Path
+
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 import seaborn as sns
 
+
+def find_repo_root(start: Path | None = None) -> Path:
+    start = (start or Path.cwd()).resolve()
+    for candidate in [start, *start.parents]:
+        if (candidate / "notebooks").exists() and (candidate / "data").exists():
+            return candidate
+    raise FileNotFoundError("Could not find repository root.")
+
+
+REPO_ROOT = find_repo_root()
+PROCESSED_DIR = REPO_ROOT / "data" / "processed"
+input_path = PROCESSED_DIR / "preprocessed.csv"
+
 # Load preprocessed dataset
-df = d0.merged_df.copy()
+df = pd.read_csv(input_path)
+print(f"Loaded dataset from: {input_path}")
 
 # %% [markdown]
 # ## 1. Dataset Overview

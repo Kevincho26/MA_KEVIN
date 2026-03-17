@@ -17,9 +17,23 @@ from pathlib import Path
 
 import pandas as pd
 
+
+def find_repo_root(start: Path | None = None) -> Path:
+    start = (start or Path.cwd()).resolve()
+    for candidate in [start, *start.parents]:
+        if (candidate / "notebooks").exists() and (candidate / "data").exists():
+            return candidate
+    raise FileNotFoundError("Could not find repository root.")
+
+
+REPO_ROOT = find_repo_root()
+RAW_DIR = REPO_ROOT / "data" / "raw"
+PROCESSED_DIR = REPO_ROOT / "data" / "processed"
+PROCESSED_DIR.mkdir(parents=True, exist_ok=True)
+
 # Load datasets
-sge_path = Path("../data/raw/250119_SGE.csv")
-context_path = Path("../data/raw/250123_Contextual.csv")
+sge_path = RAW_DIR / "250119_SGE.csv"
+context_path = RAW_DIR / "250123_Contextual.csv"
 sge_df = pd.read_csv(sge_path)
 contextual_df = pd.read_csv(context_path)
 
@@ -157,8 +171,9 @@ print(low_coverage_factors)
 
 # %%
 # Export clean dataset for EDA
-output_path = r"C:\\Master Thesis Repositories\\MAChoque\\data\\processed\\preprocessed.csv"
+output_path = PROCESSED_DIR / "preprocessed.csv"
 merged_df.to_csv(output_path, index=False)
+print(f"Dataset successfully saved to: {output_path}")
 
 # %%
 # Display dataset summary (relevant information only)
