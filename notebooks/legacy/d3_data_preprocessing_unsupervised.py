@@ -9,21 +9,28 @@ for unsupervised learning models by:
 - Exporting the result for downstream clustering and dimensionality reduction
 """
 
-import os
-import sys
 from pathlib import Path
 
-import numpy as np
 import pandas as pd
 
-# Add the parent directory to path to allow import of preprocessing script
-sys.path.append(str(Path(__file__).resolve().parents[1]))
+
+def find_repo_root(start: Path | None = None) -> Path:
+    start = (start or Path.cwd()).resolve()
+    for candidate in [start, *start.parents]:
+        if (candidate / "notebooks").exists() and (candidate / "data").exists():
+            return candidate
+    raise FileNotFoundError("Could not find repository root.")
+
+
+REPO_ROOT = find_repo_root()
+PROCESSED_DIR = REPO_ROOT / "data" / "processed"
+PROCESSED_DIR.mkdir(parents=True, exist_ok=True)
+
+input_path = PROCESSED_DIR / "preprocessed.csv"
 
 # === 1. Load Merged Clean Dataset ===
-from d0_data_preprocessing import merged_df as base_df
-
-# Copy to avoid modifying original
-df = base_df.copy()
+df = pd.read_csv(input_path).copy()
+print(f"Loaded base dataset from: {input_path}")
 
 # === 2. Drop target and irrelevant variables ===
 drop_columns = ["_Success_qual", "_Gen_ID", "Context_Others", "has_context"]
@@ -58,10 +65,9 @@ for col in contextual_vars:
         df[col] = df[col].astype(str).map(context_map).astype(int)
 
 # === 5. Export dataset ===
-output_path = (
-    r"C:\\Master Thesis Repositories\\MAChoque\\data\\processed\\preprocessed_unsupervised.csv"
-)
+output_path = PROCESSED_DIR / "preprocessed_unsupervised.csv"
 df.to_csv(output_path, index=False)
+print(f"Dataset successfully saved to: {output_path}")
 
 # === 6. Summary ===
 print("\n----- Unsupervised Preprocessing Complete -----")
