@@ -6,8 +6,11 @@ target-version = "py311"
 select = ["E", "F", "I"]
 
 [tool.ruff.lint.per-file-ignores]
-"notebooks/*.py" = ["E402", "F401", "F841"]
-"notebooks/legacy/*.py" = ["E402", "F401", "F841"]
+"notebooks/legacy/*.py" = ["E402", "E501", "F401", "F841"]
+"notebooks/legacy/*.ipynb" = ["E402", "E501", "F401", "F841"]
+"notebooks/archive/**/*.py" = ["E402", "E501", "F401", "F841"]
+"notebooks/archive/**/*.ipynb" = ["E402", "E501", "F401", "F841"]
+"scripts/legacy/*.py" = ["E402", "E501", "F401", "F841"]
 
 [tool.jupytext]
 formats = "ipynb,py:percent"

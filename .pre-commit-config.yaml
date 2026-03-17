@@ -1,6 +1,21 @@
-
-# .pre-commit-config.yaml
 repos:
+  # 1) Sync de notebooks ANTES de limpiar/formatear
+  - repo: local
+    hooks:
+      - id: jupytext-sync
+        name: jupytext --sync (paired notebooks)
+        entry: python -m jupytext --sync
+        language: system
+        files: ^notebooks/legacy/.*\.(ipynb|py)$
+
+  # 2) Strip de outputs en notebooks legacy
+  - repo: https://github.com/kynan/nbstripout
+    rev: 0.8.1
+    hooks:
+      - id: nbstripout
+        files: ^notebooks/legacy/.*\.ipynb$
+
+  # 3) Hooks generales de limpieza
   - repo: https://github.com/pre-commit/pre-commit-hooks
     rev: v6.0.0
     hooks:
@@ -10,25 +25,10 @@ repos:
       - id: check-added-large-files
         args: ["--maxkb=2000"]
 
+  # 4) Ruff al final
   - repo: https://github.com/astral-sh/ruff-pre-commit
     rev: v0.14.10
     hooks:
+      - id: ruff-format
       - id: ruff-check
         args: [--fix]
-      - id: ruff-format
-
-  - repo: https://github.com/kynan/nbstripout
-    rev: 0.8.1
-    hooks:
-      - id: nbstripout
-        files: \.ipynb$
-
-  # Jupytext (sync de notebooks + scripts pareados)
-  - repo: local
-    hooks:
-      - id: jupytext-sync
-        name: jupytext --sync (paired notebooks)
-        entry: python -m jupytext --sync
-        language: python
-        additional_dependencies: [jupytext]
-        files: ^notebooks/.*\.(ipynb|py)$
