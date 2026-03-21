@@ -45,7 +45,7 @@ if scaled_columns:
     df[scaled_columns] = scaler.fit_transform(df[scaled_columns])
 
 # Save refined dataset for unsupervised learning models
-output_path = PROCESSED_DIR / "processed_unsupervised.csv"
+output_path = PROCESSED_DIR / "unsupervised_modeling_dataset.csv"
 df.to_csv(output_path, index=False)
 
 # Final confirmation

@@ -18,6 +18,8 @@
 # This script applies DBSCAN to the PCA-reduced data to identify natural clusters and outliers.
 
 # === 1. Imports ===
+from pathlib import Path
+
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
@@ -28,10 +30,20 @@ from sklearn.metrics import silhouette_score
 from sklearn.neighbors import NearestNeighbors
 from sklearn.preprocessing import StandardScaler
 
+
+def find_repo_root(start: Path | None = None) -> Path:
+    start = (start or Path.cwd()).resolve()
+    for candidate in [start, *start.parents]:
+        if (candidate / "notebooks").exists() and (candidate / "data").exists():
+            return candidate
+    raise FileNotFoundError("Could not find repository root.")
+
+
+REPO_ROOT = find_repo_root()
+PROCESSED_DIR = REPO_ROOT / "data" / "processed"
+
 # === 2. Load Preprocessed Unsupervised Dataset ===
-csv_path = (
-    r"C:\\Master Thesis Repositories\\MAChoque\\data\\processed\\preprocessed_unsupervised.csv"
-)
+csv_path = PROCESSED_DIR / "unsupervised_modeling_dataset.csv"
 df = pd.read_csv(csv_path)
 
 # === 3. Standardize ===
@@ -105,9 +117,7 @@ from sklearn.neighbors import NearestNeighbors
 from sklearn.preprocessing import StandardScaler
 
 # === 2. Load Preprocessed Unsupervised Dataset ===
-csv_path = (
-    r"C:\\Master Thesis Repositories\\MAChoque\\data\\processed\\preprocessed_unsupervised.csv"
-)
+csv_path = PROCESSED_DIR / "unsupervised_modeling_dataset.csv"
 df = pd.read_csv(csv_path)
 
 # === 3. Standardize ===
@@ -185,9 +195,7 @@ from sklearn.neighbors import NearestNeighbors
 from sklearn.preprocessing import StandardScaler
 
 # === 2. Load Preprocessed Unsupervised Dataset ===
-csv_path = (
-    r"C:\\Master Thesis Repositories\\MAChoque\\data\\processed\\preprocessed_unsupervised.csv"
-)
+csv_path = PROCESSED_DIR / "unsupervised_modeling_dataset.csv"
 df = pd.read_csv(csv_path)
 
 # === 3. Standardize ===
@@ -249,7 +257,7 @@ print("\nDistribution of Samples per Cluster:")
 print(cluster_counts)
 
 # === 10. Add Cluster to Original Dataset and Show _Success_qual by Cluster ===
-original_data_path = r"C:\\Master Thesis Repositories\\MAChoque\\data\\processed\\preprocessed.csv"
+original_data_path = PROCESSED_DIR / "base_dataset.csv"
 df_original = pd.read_csv(original_data_path)
 df_original["Cluster"] = labels
 
