@@ -64,7 +64,7 @@ for col in contextual_cols:
 df["_Success_qual"] = df["_Success_qual"].apply(lambda x: 1 if x == "successful" else 0)
 
 # === 6. Export Supervised-Ready Dataset ===
-output_path = PROCESSED_DIR / "preprocessed_supervised.csv"
+output_path = PROCESSED_DIR / "supervised_modeling_dataset.csv"
 df.to_csv(output_path, index=False)
 print(f"Dataset successfully saved to: {output_path}")
 

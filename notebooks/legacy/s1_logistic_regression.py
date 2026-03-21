@@ -22,6 +22,8 @@ with data processed from d2_data_preprocessing_supervised.
 """
 
 # === 1. Imports and Setup ===
+from pathlib import Path
+
 import matplotlib.pyplot as plt
 import pandas as pd
 import seaborn as sns
@@ -36,9 +38,22 @@ from sklearn.metrics import (
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import StandardScaler
 
-# === 2. Load Preprocessed Supervised Dataset ===
-csv_path = r"C:\\Master Thesis Repositories\\MAChoque\\data\\processed\\preprocessed_supervised.csv"
+
+def find_repo_root(start: Path | None = None) -> Path:
+    start = (start or Path.cwd()).resolve()
+    for candidate in [start, *start.parents]:
+        if (candidate / "notebooks").exists() and (candidate / "data").exists():
+            return candidate
+    raise FileNotFoundError("Could not find repository root.")
+
+
+REPO_ROOT = find_repo_root()
+PROCESSED_DIR = REPO_ROOT / "data" / "processed"
+csv_path = PROCESSED_DIR / "supervised_modeling_dataset.csv"
+
+# === 2. Load Supervised Modeling Dataset ===
 df = pd.read_csv(csv_path)
+print(f"Loaded supervised dataset from: {csv_path}")
 
 # === 3. Prepare Features and Target ===
 colinear_vars = ["_δND", "_share_RSE_internal"]

@@ -21,6 +21,8 @@ The goal is to understand natural decision boundaries and extract interpretable 
 """
 
 # === 1. Imports and Setup ===
+from pathlib import Path
+
 import matplotlib.pyplot as plt
 import pandas as pd
 import seaborn as sns
@@ -34,8 +36,20 @@ from sklearn.metrics import (
 from sklearn.model_selection import train_test_split
 from sklearn.tree import DecisionTreeClassifier, plot_tree
 
+
+def find_repo_root(start: Path | None = None) -> Path:
+    start = (start or Path.cwd()).resolve()
+    for candidate in [start, *start.parents]:
+        if (candidate / "notebooks").exists() and (candidate / "data").exists():
+            return candidate
+    raise FileNotFoundError("Could not find repository root.")
+
+
+REPO_ROOT = find_repo_root()
+PROCESSED_DIR = REPO_ROOT / "data" / "processed"
+
 # === 2. Load Preprocessed Supervised Dataset ===
-csv_path = r"C:\\Master Thesis Repositories\\MAChoque\\data\\processed\\preprocessed_supervised.csv"
+csv_path = PROCESSED_DIR / "supervised_modeling_dataset.csv"
 df = pd.read_csv(csv_path)
 
 # === 3. Prepare Features and Target ===
@@ -138,7 +152,7 @@ from sklearn.model_selection import train_test_split
 from sklearn.tree import DecisionTreeClassifier, plot_tree
 
 # === 2. Load Preprocessed Supervised Dataset ===
-csv_path = r"C:\\Master Thesis Repositories\\MAChoque\\data\\processed\\preprocessed_supervised.csv"
+csv_path = PROCESSED_DIR / "supervised_modeling_dataset.csv"
 df = pd.read_csv(csv_path)
 
 # === 3. Prepare Features and Target ===
@@ -236,7 +250,7 @@ from sklearn.model_selection import train_test_split
 from sklearn.tree import DecisionTreeClassifier, plot_tree
 
 # === 2. Load Preprocessed Supervised Dataset ===
-csv_path = r"C:\\Master Thesis Repositories\\MAChoque\\data\\processed\\preprocessed_supervised.csv"
+csv_path = PROCESSED_DIR / "supervised_modeling_dataset.csv"
 df = pd.read_csv(csv_path)
 
 # === 3. Prepare Features and Target ===
@@ -341,7 +355,7 @@ from sklearn.model_selection import train_test_split
 from sklearn.tree import DecisionTreeClassifier, plot_tree
 
 # === 2. Load Preprocessed Supervised Dataset ===
-csv_path = r"C:\\Master Thesis Repositories\\MAChoque\\data\\processed\\preprocessed_supervised.csv"
+csv_path = PROCESSED_DIR / "supervised_modeling_dataset.csv"
 df = pd.read_csv(csv_path)
 
 # === 3. Prepare Features and Target ===

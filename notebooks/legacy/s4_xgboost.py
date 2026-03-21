@@ -17,6 +17,8 @@
 
 
 # === 1. Imports and Setup ===
+from pathlib import Path
+
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
@@ -31,8 +33,20 @@ from sklearn.metrics import (
 from sklearn.model_selection import train_test_split
 from xgboost import XGBClassifier
 
+
+def find_repo_root(start: Path | None = None) -> Path:
+    start = (start or Path.cwd()).resolve()
+    for candidate in [start, *start.parents]:
+        if (candidate / "notebooks").exists() and (candidate / "data").exists():
+            return candidate
+    raise FileNotFoundError("Could not find repository root.")
+
+
+REPO_ROOT = find_repo_root()
+PROCESSED_DIR = REPO_ROOT / "data" / "processed"
+
 # === 2. Load Preprocessed Supervised Dataset ===
-csv_path = r"C:\\Master Thesis Repositories\\MAChoque\\data\\processed\\preprocessed_supervised.csv"
+csv_path = PROCESSED_DIR / "supervised_modeling_dataset.csv"
 df = pd.read_csv(csv_path)
 
 # === 3. Prepare Features and Target ===
@@ -117,7 +131,7 @@ from sklearn.model_selection import train_test_split
 from xgboost import XGBClassifier
 
 # === 2. Load Preprocessed Supervised Dataset ===
-csv_path = r"C:\\Master Thesis Repositories\\MAChoque\\data\\processed\\preprocessed_supervised.csv"
+csv_path = PROCESSED_DIR / "supervised_modeling_dataset.csv"
 df = pd.read_csv(csv_path)
 
 # === 3. Prepare Features and Target ===
@@ -205,7 +219,7 @@ from sklearn.model_selection import train_test_split
 from xgboost import XGBClassifier
 
 # === 2. Load Preprocessed Supervised Dataset ===
-csv_path = r"C:\\Master Thesis Repositories\\MAChoque\\data\\processed\\preprocessed_supervised.csv"
+csv_path = PROCESSED_DIR / "supervised_modeling_dataset.csv"
 df = pd.read_csv(csv_path)
 
 # === 3. Prepare Features and Target ===
@@ -293,7 +307,7 @@ from sklearn.model_selection import train_test_split
 from xgboost import XGBClassifier
 
 # === 2. Load Preprocessed Supervised Dataset ===
-csv_path = r"C:\\Master Thesis Repositories\\MAChoque\\data\\processed\\preprocessed_supervised.csv"
+csv_path = PROCESSED_DIR / "supervised_modeling_dataset.csv"
 df = pd.read_csv(csv_path)
 
 # === 3. Prepare Features and Target ===
@@ -365,6 +379,8 @@ print(importance_df.head())
 # This version applies SMOTE to balance the training data and trains an XGBoost classifier with class_weight approximation and threshold adjustment.
 
 # === 1. Imports and Setup ===
+from pathlib import Path
+
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
@@ -380,8 +396,20 @@ from sklearn.metrics import (
 from sklearn.model_selection import train_test_split
 from xgboost import XGBClassifier
 
+
+def find_repo_root(start: Path | None = None) -> Path:
+    start = (start or Path.cwd()).resolve()
+    for candidate in [start, *start.parents]:
+        if (candidate / "notebooks").exists() and (candidate / "data").exists():
+            return candidate
+    raise FileNotFoundError("Could not find repository root.")
+
+
+REPO_ROOT = find_repo_root()
+PROCESSED_DIR = REPO_ROOT / "data" / "processed"
+
 # === 2. Load Preprocessed Supervised Dataset ===
-csv_path = r"C:\\Master Thesis Repositories\\MAChoque\\data\\processed\\preprocessed_supervised.csv"
+csv_path = PROCESSED_DIR / "supervised_modeling_dataset.csv"
 df = pd.read_csv(csv_path)
 
 # === 3. Prepare Features and Target ===
