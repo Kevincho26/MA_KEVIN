@@ -25,3 +25,7 @@ reports/figures/
 # Clean rename
 data/processed/*.csv
 !data/processed/.gitkeep
+
+# Legacy notebooks archive pending review
+notebooks/archive/*
+!notebooks/archive/README.md
