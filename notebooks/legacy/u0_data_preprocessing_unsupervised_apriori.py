@@ -92,7 +92,7 @@ if non_binary_cols:
     print("Warning: The following columns are not strictly binary:", non_binary_cols)
 
 # Export binarized dataset
-output_path = PROCESSED_DIR / "processed_unsupervised_apriori.csv"
+output_path = PROCESSED_DIR / "association_rules_dataset.csv"
 df.to_csv(output_path, index=False)
 
 print("\n----- Apriori Dataset Summary -----")
