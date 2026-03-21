@@ -171,7 +171,7 @@ print(low_coverage_factors)
 
 # %%
 # Export clean dataset for EDA
-output_path = PROCESSED_DIR / "preprocessed.csv"
+output_path = PROCESSED_DIR / "base_dataset.csv"
 merged_df.to_csv(output_path, index=False)
 print(f"Dataset successfully saved to: {output_path}")
 

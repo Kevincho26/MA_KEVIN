@@ -27,7 +27,7 @@ REPO_ROOT = find_repo_root()
 PROCESSED_DIR = REPO_ROOT / "data" / "processed"
 PROCESSED_DIR.mkdir(parents=True, exist_ok=True)
 
-input_path = PROCESSED_DIR / "preprocessed.csv"
+input_path = PROCESSED_DIR / "base_dataset.csv"
 
 # === 1. Load Merged Clean Dataset ===
 df = pd.read_csv(input_path).copy()

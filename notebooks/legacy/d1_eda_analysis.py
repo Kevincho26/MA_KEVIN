@@ -28,7 +28,7 @@ def find_repo_root(start: Path | None = None) -> Path:
 
 REPO_ROOT = find_repo_root()
 PROCESSED_DIR = REPO_ROOT / "data" / "processed"
-input_path = PROCESSED_DIR / "preprocessed.csv"
+input_path = PROCESSED_DIR / "base_dataset.csv"
 
 # Load preprocessed dataset
 df = pd.read_csv(input_path)
