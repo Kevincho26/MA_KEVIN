@@ -21,3 +21,7 @@ data/interim/
 # Model outputs / reports (opcional)
 models/
 reports/figures/
+
+# Clean rename
+data/processed/*.csv
+!data/processed/.gitkeep
