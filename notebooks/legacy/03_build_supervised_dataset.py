@@ -15,7 +15,7 @@
 """
 Supervised Data Preprocessing Module
 -------------------------------------
-This script prepares the cleaned dataset from `d0_data_preprocessing`
+This script prepares the cleaned dataset from `01_build_base_dataset`
 for supervised learning models by:
 - Dropping non-predictive and irrelevant columns
 - Encoding categorical product profile variables with ordinal meaning

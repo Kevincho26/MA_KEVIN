@@ -18,7 +18,7 @@
 Logistic Regression Model for Predicting Product Success (_Success_qual)
 ------------------------------------------------------------------------
 This notebook performs binary classification using Logistic Regression,
-with data processed from d2_data_preprocessing_supervised.
+with data processed from 03_build_supervised_dataset.
 """
 
 # === 1. Imports and Setup ===

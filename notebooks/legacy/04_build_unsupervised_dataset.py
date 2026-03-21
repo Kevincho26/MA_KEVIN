@@ -15,7 +15,7 @@
 """
 Unsupervised Data Preprocessing Module
 ----------------------------------------
-This script prepares the cleaned dataset from `d0_data_preprocessing`
+This script prepares the cleaned dataset from `01_build_base_dataset`
 for unsupervised learning models by:
 - Dropping target and identifiers
 - Encoding categorical product profile variables with ordinal meaning
