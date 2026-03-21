@@ -65,7 +65,7 @@ for col in contextual_vars:
         df[col] = df[col].astype(str).map(context_map).astype(int)
 
 # === 5. Export dataset ===
-output_path = PROCESSED_DIR / "preprocessed_unsupervised.csv"
+output_path = PROCESSED_DIR / "unsupervised_base_dataset.csv"
 df.to_csv(output_path, index=False)
 print(f"Dataset successfully saved to: {output_path}")
 

@@ -27,7 +27,7 @@ REPO_ROOT = find_repo_root()
 PROCESSED_DIR = REPO_ROOT / "data" / "processed"
 PROCESSED_DIR.mkdir(parents=True, exist_ok=True)
 
-input_path = PROCESSED_DIR / "preprocessed_unsupervised.csv"
+input_path = PROCESSED_DIR / "unsupervised_base_dataset.csv"
 
 # Load dataset prepared for unsupervised learning
 df = pd.read_csv(input_path).copy()
