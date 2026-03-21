@@ -1,3 +1,17 @@
+# ---
+# jupyter:
+#   jupytext:
+#     cell_metadata_filter: -all
+#     formats: ipynb,py:percent
+#     notebook_metadata_filter: jupytext,-kernelspec,-language_info
+#     text_representation:
+#       extension: .py
+#       format_name: percent
+#       format_version: '1.3'
+#       jupytext_version: 1.19.1
+# ---
+
+# %%
 """
 Apriori Feature Refinement Module
 --------------------------------
@@ -10,11 +24,14 @@ This script refines the unsupervised dataset generated from the base pipeline by
 - Exporting a binary dataset for Apriori and association rules
 """
 
+# %%
 from pathlib import Path
 
+# %%
 import pandas as pd
 
 
+# %%
 def find_repo_root(start: Path | None = None) -> Path:
     start = (start or Path.cwd()).resolve()
     for candidate in [start, *start.parents]:
@@ -23,16 +40,20 @@ def find_repo_root(start: Path | None = None) -> Path:
     raise FileNotFoundError("Could not find repository root.")
 
 
+# %%
 REPO_ROOT = find_repo_root()
 PROCESSED_DIR = REPO_ROOT / "data" / "processed"
 PROCESSED_DIR.mkdir(parents=True, exist_ok=True)
 
+# %%
 input_path = PROCESSED_DIR / "unsupervised_base_dataset.csv"
 
+# %%
 # Load dataset prepared for unsupervised learning
 df = pd.read_csv(input_path).copy()
 print(f"Loaded unsupervised base dataset from: {input_path}")
 
+# %%
 # Binarize product profile variation columns
 variation_cols = [
     "_PP_Claim_Variation",
@@ -40,8 +61,10 @@ variation_cols = [
     "_Customer_Benefit_Variation",
 ]
 
+# %%
 variation_value_map = {0: "CV", 1: "AV", 2: "PV"}
 
+# %%
 for col in variation_cols:
     if col in df.columns:
         mapped = df[col].map(variation_value_map)
@@ -49,6 +72,7 @@ for col in variation_cols:
             df[f"{col}_{label}"] = (mapped == label).astype(int)
         df.drop(columns=[col], inplace=True)
 
+# %%
 # Discretize continuous technical variables into binary bins
 continuous_cols = [
     "_δCV",
@@ -59,6 +83,7 @@ continuous_cols = [
     "_share_RSE_internal",
 ]
 
+# %%
 for col in continuous_cols:
     if col in df.columns:
         series = pd.to_numeric(df[col], errors="coerce")
@@ -67,6 +92,7 @@ for col in continuous_cols:
         df[f"{col}_high"] = (series >= 0.66).astype(int)
         df.drop(columns=[col], inplace=True)
 
+# %%
 # Convert generation to binned categories
 if "_Generation" in df.columns:
     generation = pd.to_numeric(df["_Generation"], errors="coerce")
@@ -79,22 +105,27 @@ if "_Generation" in df.columns:
 
     df.drop(columns=["_Generation"], inplace=True)
 
+# %%
 # One-hot encode remaining contextual ordinal columns
 contextual_cols = [col for col in df.columns if not col.startswith("_")]
 
+# %%
 for col in contextual_cols:
     dummies = pd.get_dummies(df[col].astype(str), prefix=col)
     df = pd.concat([df.drop(columns=[col]), dummies], axis=1)
 
+# %%
 # Final check: ensure all variables are binary (0/1)
 non_binary_cols = [col for col in df.columns if not set(df[col].dropna().unique()).issubset({0, 1})]
 if non_binary_cols:
     print("Warning: The following columns are not strictly binary:", non_binary_cols)
 
+# %%
 # Export binarized dataset
 output_path = PROCESSED_DIR / "association_rules_dataset.csv"
 df.to_csv(output_path, index=False)
 
+# %%
 print("\n----- Apriori Dataset Summary -----")
 print("Shape:", df.shape)
 print("Binary columns:", df.columns.tolist()[:10], "...")

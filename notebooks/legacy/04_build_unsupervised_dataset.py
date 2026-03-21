@@ -1,3 +1,17 @@
+# ---
+# jupyter:
+#   jupytext:
+#     cell_metadata_filter: -all
+#     formats: ipynb,py:percent
+#     notebook_metadata_filter: jupytext,-kernelspec,-language_info
+#     text_representation:
+#       extension: .py
+#       format_name: percent
+#       format_version: '1.3'
+#       jupytext_version: 1.19.1
+# ---
+
+# %%
 """
 Unsupervised Data Preprocessing Module
 ----------------------------------------
@@ -9,11 +23,14 @@ for unsupervised learning models by:
 - Exporting the result for downstream clustering and dimensionality reduction
 """
 
+# %%
 from pathlib import Path
 
+# %%
 import pandas as pd
 
 
+# %%
 def find_repo_root(start: Path | None = None) -> Path:
     start = (start or Path.cwd()).resolve()
     for candidate in [start, *start.parents]:
@@ -22,20 +39,25 @@ def find_repo_root(start: Path | None = None) -> Path:
     raise FileNotFoundError("Could not find repository root.")
 
 
+# %%
 REPO_ROOT = find_repo_root()
 PROCESSED_DIR = REPO_ROOT / "data" / "processed"
 PROCESSED_DIR.mkdir(parents=True, exist_ok=True)
 
+# %%
 input_path = PROCESSED_DIR / "base_dataset.csv"
 
+# %%
 # === 1. Load Merged Clean Dataset ===
 df = pd.read_csv(input_path).copy()
 print(f"Loaded base dataset from: {input_path}")
 
+# %%
 # === 2. Drop target and irrelevant variables ===
 drop_columns = ["_Success_qual", "_Gen_ID", "Context_Others", "has_context"]
 df.drop(columns=drop_columns, inplace=True, errors="ignore")
 
+# %%
 # === 3. Encode Product Profile Variation (ordinal: CV < AV < PV) ===
 variation_map = {"CV": 0, "AV": 1, "PV": 2}
 profile_vars = [
@@ -47,6 +69,7 @@ for col in profile_vars:
     if col in df.columns:
         df[col] = df[col].map(variation_map).astype(int)
 
+# %%
 # === 4. Encode Contextual Variables (ordinal: 0 < low < high) ===
 contextual_vars = [
     "Competition",
@@ -64,11 +87,13 @@ for col in contextual_vars:
     if col in df.columns:
         df[col] = df[col].astype(str).map(context_map).astype(int)
 
+# %%
 # === 5. Export dataset ===
 output_path = PROCESSED_DIR / "unsupervised_base_dataset.csv"
 df.to_csv(output_path, index=False)
 print(f"Dataset successfully saved to: {output_path}")
 
+# %%
 # === 6. Summary ===
 print("\n----- Unsupervised Preprocessing Complete -----")
 print(f"Final shape: {df.shape}")
