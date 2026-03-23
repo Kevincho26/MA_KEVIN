@@ -25,24 +25,11 @@ for supervised learning models by:
 """
 
 # %%
-from pathlib import Path
-
-# %%
 import pandas as pd
 
-
 # %%
-def find_repo_root(start: Path | None = None) -> Path:
-    start = (start or Path.cwd()).resolve()
-    for candidate in [start, *start.parents]:
-        if (candidate / "notebooks").exists() and (candidate / "data").exists():
-            return candidate
-    raise FileNotFoundError("Could not find repository root.")
+from src.utils.paths import PROCESSED_DIR
 
-
-# %%
-REPO_ROOT = find_repo_root()
-PROCESSED_DIR = REPO_ROOT / "data" / "processed"
 PROCESSED_DIR.mkdir(parents=True, exist_ok=True)
 
 # %%

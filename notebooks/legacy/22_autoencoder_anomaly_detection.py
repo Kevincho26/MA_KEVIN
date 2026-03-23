@@ -19,8 +19,6 @@
 # potential pattern discovery or anomaly detection in the dataset.
 
 # === 1. Imports ===
-from pathlib import Path
-
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
@@ -30,17 +28,7 @@ from sklearn.preprocessing import StandardScaler
 from tensorflow.keras.layers import Dense, Input
 from tensorflow.keras.models import Model
 
-
-def find_repo_root(start: Path | None = None) -> Path:
-    start = (start or Path.cwd()).resolve()
-    for candidate in [start, *start.parents]:
-        if (candidate / "notebooks").exists() and (candidate / "data").exists():
-            return candidate
-    raise FileNotFoundError("Could not find repository root.")
-
-
-REPO_ROOT = find_repo_root()
-PROCESSED_DIR = REPO_ROOT / "data" / "processed"
+from src.utils.paths import PROCESSED_DIR
 
 # === 2. Load Preprocessed Unsupervised Dataset ===
 csv_path = PROCESSED_DIR / "unsupervised_modeling_dataset.csv"

@@ -22,8 +22,6 @@ with data processed from 03_build_supervised_dataset.
 """
 
 # === 1. Imports and Setup ===
-from pathlib import Path
-
 import matplotlib.pyplot as plt
 import pandas as pd
 import seaborn as sns
@@ -38,17 +36,8 @@ from sklearn.metrics import (
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import StandardScaler
 
+from src.utils.paths import PROCESSED_DIR
 
-def find_repo_root(start: Path | None = None) -> Path:
-    start = (start or Path.cwd()).resolve()
-    for candidate in [start, *start.parents]:
-        if (candidate / "notebooks").exists() and (candidate / "data").exists():
-            return candidate
-    raise FileNotFoundError("Could not find repository root.")
-
-
-REPO_ROOT = find_repo_root()
-PROCESSED_DIR = REPO_ROOT / "data" / "processed"
 csv_path = PROCESSED_DIR / "supervised_modeling_dataset.csv"
 
 # === 2. Load Supervised Modeling Dataset ===

@@ -13,22 +13,10 @@
 # # Data Preprocessing
 
 # %%
-from pathlib import Path
-
 import pandas as pd
 
+from src.utils.paths import PROCESSED_DIR, RAW_DIR
 
-def find_repo_root(start: Path | None = None) -> Path:
-    start = (start or Path.cwd()).resolve()
-    for candidate in [start, *start.parents]:
-        if (candidate / "notebooks").exists() and (candidate / "data").exists():
-            return candidate
-    raise FileNotFoundError("Could not find repository root.")
-
-
-REPO_ROOT = find_repo_root()
-RAW_DIR = REPO_ROOT / "data" / "raw"
-PROCESSED_DIR = REPO_ROOT / "data" / "processed"
 PROCESSED_DIR.mkdir(parents=True, exist_ok=True)
 
 # Load datasets

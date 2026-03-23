@@ -10,24 +10,13 @@
 # ---
 
 # %%
-from pathlib import Path
-
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 import seaborn as sns
 
+from src.utils.paths import PROCESSED_DIR
 
-def find_repo_root(start: Path | None = None) -> Path:
-    start = (start or Path.cwd()).resolve()
-    for candidate in [start, *start.parents]:
-        if (candidate / "notebooks").exists() and (candidate / "data").exists():
-            return candidate
-    raise FileNotFoundError("Could not find repository root.")
-
-
-REPO_ROOT = find_repo_root()
-PROCESSED_DIR = REPO_ROOT / "data" / "processed"
 input_path = PROCESSED_DIR / "base_dataset.csv"
 
 # Load preprocessed dataset
