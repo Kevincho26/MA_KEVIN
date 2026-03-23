@@ -30,8 +30,7 @@ from sklearn.decomposition import PCA
 from sklearn.metrics import silhouette_score
 from sklearn.preprocessing import StandardScaler
 
-from src.data.loaders import load_unsupervised_modeling_dataset
-from src.utils.paths import PROCESSED_DIR
+from src.data.loaders import load_base_dataset, load_unsupervised_modeling_dataset
 
 # === 2. Load Preprocessed Unsupervised Dataset ===
 df = load_unsupervised_modeling_dataset()
@@ -81,8 +80,7 @@ plt.tight_layout()
 plt.show()
 
 # === 10. Add Cluster to Original Dataset and Show _Success_qual by Cluster ===
-original_data_path = PROCESSED_DIR / "base_dataset.csv"
-df_original = pd.read_csv(original_data_path)
+df_original = load_base_dataset()
 df_original["Cluster"] = cluster_labels
 
 if "_Success_qual" in df_original.columns:

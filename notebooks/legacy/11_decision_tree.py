@@ -34,11 +34,10 @@ from sklearn.metrics import (
 from sklearn.model_selection import train_test_split
 from sklearn.tree import DecisionTreeClassifier, plot_tree
 
-from src.utils.paths import PROCESSED_DIR
+from src.data.loaders import load_supervised_modeling_dataset
 
 # === 2. Load Preprocessed Supervised Dataset ===
-csv_path = PROCESSED_DIR / "supervised_modeling_dataset.csv"
-df = pd.read_csv(csv_path)
+df = load_supervised_modeling_dataset()
 
 # === 3. Prepare Features and Target ===
 colinear_vars = ["_δND", "_share_RSE_internal"]
@@ -140,8 +139,7 @@ from sklearn.model_selection import train_test_split
 from sklearn.tree import DecisionTreeClassifier, plot_tree
 
 # === 2. Load Preprocessed Supervised Dataset ===
-csv_path = PROCESSED_DIR / "supervised_modeling_dataset.csv"
-df = pd.read_csv(csv_path)
+df = load_supervised_modeling_dataset()
 
 # === 3. Prepare Features and Target ===
 colinear_vars = ["_δND", "_share_RSE_internal"]
@@ -238,8 +236,7 @@ from sklearn.model_selection import train_test_split
 from sklearn.tree import DecisionTreeClassifier, plot_tree
 
 # === 2. Load Preprocessed Supervised Dataset ===
-csv_path = PROCESSED_DIR / "supervised_modeling_dataset.csv"
-df = pd.read_csv(csv_path)
+df = load_supervised_modeling_dataset()
 
 # === 3. Prepare Features and Target ===
 colinear_vars = ["_δND", "_share_RSE_internal"]
@@ -343,8 +340,8 @@ from sklearn.model_selection import train_test_split
 from sklearn.tree import DecisionTreeClassifier, plot_tree
 
 # === 2. Load Preprocessed Supervised Dataset ===
-csv_path = PROCESSED_DIR / "supervised_modeling_dataset.csv"
-df = pd.read_csv(csv_path)
+df = load_supervised_modeling_dataset()
+
 
 # === 3. Prepare Features and Target ===
 colinear_vars = ["_δND", "_share_RSE_internal"]
