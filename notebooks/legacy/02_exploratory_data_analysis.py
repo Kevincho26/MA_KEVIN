@@ -15,13 +15,11 @@ import numpy as np
 import pandas as pd
 import seaborn as sns
 
-from src.utils.paths import PROCESSED_DIR
-
-input_path = PROCESSED_DIR / "base_dataset.csv"
+from src.data.loaders import load_base_dataset
 
 # Load preprocessed dataset
-df = pd.read_csv(input_path)
-print(f"Loaded dataset from: {input_path}")
+df = load_base_dataset()
+print("Loaded base dataset")
 
 # %% [markdown]
 # ## 1. Dataset Overview

@@ -28,11 +28,12 @@ from sklearn.preprocessing import StandardScaler
 from tensorflow.keras.layers import Dense, Input
 from tensorflow.keras.models import Model
 
+from src.data.loaders import load_unsupervised_modeling_dataset
 from src.utils.paths import PROCESSED_DIR
 
 # === 2. Load Preprocessed Unsupervised Dataset ===
-csv_path = PROCESSED_DIR / "unsupervised_modeling_dataset.csv"
-df = pd.read_csv(csv_path)
+df = load_unsupervised_modeling_dataset()
+print("Loaded unsupervised modeling dataset")
 
 # === 2.1 Load full product info with Gen_ID ===
 original_data_path = PROCESSED_DIR / "base_dataset.csv"

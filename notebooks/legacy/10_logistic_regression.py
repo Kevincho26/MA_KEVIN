@@ -36,13 +36,11 @@ from sklearn.metrics import (
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import StandardScaler
 
-from src.utils.paths import PROCESSED_DIR
-
-csv_path = PROCESSED_DIR / "supervised_modeling_dataset.csv"
+from src.data.loaders import load_supervised_modeling_dataset
 
 # === 2. Load Supervised Modeling Dataset ===
-df = pd.read_csv(csv_path)
-print(f"Loaded supervised dataset from: {csv_path}")
+df = load_supervised_modeling_dataset()
+print("Loaded supervised modeling dataset")
 
 # === 3. Prepare Features and Target ===
 colinear_vars = ["_δND", "_share_RSE_internal"]

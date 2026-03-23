@@ -30,11 +30,12 @@ from sklearn.decomposition import PCA
 from sklearn.metrics import silhouette_score
 from sklearn.preprocessing import StandardScaler
 
+from src.data.loaders import load_unsupervised_modeling_dataset
 from src.utils.paths import PROCESSED_DIR
 
 # === 2. Load Preprocessed Unsupervised Dataset ===
-csv_path = PROCESSED_DIR / "unsupervised_modeling_dataset.csv"
-df = pd.read_csv(csv_path)
+df = load_unsupervised_modeling_dataset()
+print("Loaded unsupervised modeling dataset")
 
 # === 3. Standardize ===
 scaler = StandardScaler()
