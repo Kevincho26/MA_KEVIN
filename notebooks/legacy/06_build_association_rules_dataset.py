@@ -28,17 +28,13 @@ This script refines the unsupervised dataset generated from the base pipeline by
 import pandas as pd
 
 # %%
+# Load dataset prepared for unsupervised learning
+from src.data.loaders import load_unsupervised_base_dataset
 from src.utils.paths import PROCESSED_DIR
 
 PROCESSED_DIR.mkdir(parents=True, exist_ok=True)
 
-# %%
-input_path = PROCESSED_DIR / "unsupervised_base_dataset.csv"
-
-# %%
-# Load dataset prepared for unsupervised learning
-df = pd.read_csv(input_path).copy()
-print(f"Loaded unsupervised base dataset from: {input_path}")
+df = load_unsupervised_base_dataset().copy()
 
 # %%
 # Binarize product profile variation columns

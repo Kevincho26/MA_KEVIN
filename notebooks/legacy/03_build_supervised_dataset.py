@@ -28,17 +28,13 @@ for supervised learning models by:
 import pandas as pd
 
 # %%
+# === 1. Load Merged Clean Dataset ===
+from src.data.loaders import load_base_dataset
 from src.utils.paths import PROCESSED_DIR
 
 PROCESSED_DIR.mkdir(parents=True, exist_ok=True)
 
-# %%
-input_path = PROCESSED_DIR / "base_dataset.csv"
-
-# %%
-# === 1. Load Merged Clean Dataset ===
-df = pd.read_csv(input_path).copy()
-print(f"Loaded base dataset from: {input_path}")
+df = load_base_dataset().copy()
 
 # %%
 # === 2. Drop non-informative or irrelevant columns ===
