@@ -37,14 +37,15 @@ from sklearn.metrics import (
 from sklearn.model_selection import train_test_split
 
 from src.data.loaders import load_supervised_modeling_dataset
+from src.features.preprocessing import drop_columns_if_present, split_features_and_target
 
 # === 2. Load Preprocessed Supervised Dataset ===
 df = load_supervised_modeling_dataset()
 
 # === 3. Prepare Features and Target ===
 colinear_vars = ["_δND", "_share_RSE_internal"]
-X = df.drop(columns=["_Success_qual"] + colinear_vars, errors="ignore")
-y = df["_Success_qual"]
+X, y = split_features_and_target(df, "_Success_qual")
+X = drop_columns_if_present(X, colinear_vars)
 
 X_train, X_test, y_train, y_test = train_test_split(
     X, y, test_size=0.3, random_state=42, stratify=y
@@ -122,8 +123,8 @@ df = load_supervised_modeling_dataset()
 
 # === 3. Prepare Features and Target ===
 colinear_vars = ["_δND", "_share_RSE_internal"]
-X = df.drop(columns=["_Success_qual"] + colinear_vars, errors="ignore")
-y = df["_Success_qual"]
+X, y = split_features_and_target(df, "_Success_qual")
+X = drop_columns_if_present(X, colinear_vars)
 
 X_train, X_test, y_train, y_test = train_test_split(
     X, y, test_size=0.3, random_state=42, stratify=y
@@ -202,8 +203,8 @@ df = load_supervised_modeling_dataset()
 
 # === 3. Prepare Features and Target ===
 colinear_vars = ["_δND", "_share_RSE_internal"]
-X = df.drop(columns=["_Success_qual"] + colinear_vars, errors="ignore")
-y = df["_Success_qual"]
+X, y = split_features_and_target(df, "_Success_qual")
+X = drop_columns_if_present(X, colinear_vars)
 
 X_train, X_test, y_train, y_test = train_test_split(
     X, y, test_size=0.3, random_state=42, stratify=y
@@ -290,8 +291,8 @@ df = load_supervised_modeling_dataset()
 
 # === 3. Prepare Features and Target ===
 colinear_vars = ["_δND", "_share_RSE_internal"]
-X = df.drop(columns=["_Success_qual"] + colinear_vars, errors="ignore")
-y = df["_Success_qual"]
+X, y = split_features_and_target(df, "_Success_qual")
+X = drop_columns_if_present(X, colinear_vars)
 
 X_train, X_test, y_train, y_test = train_test_split(
     X, y, test_size=0.3, random_state=42, stratify=y
