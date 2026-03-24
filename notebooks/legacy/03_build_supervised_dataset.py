@@ -30,6 +30,7 @@ import pandas as pd
 # %%
 # === 1. Load Merged Clean Dataset ===
 from src.data.loaders import load_base_dataset
+from src.features.preprocessing import drop_columns_if_present
 from src.utils.paths import PROCESSED_DIR
 
 PROCESSED_DIR.mkdir(parents=True, exist_ok=True)
@@ -39,7 +40,7 @@ df = load_base_dataset().copy()
 # %%
 # === 2. Drop non-informative or irrelevant columns ===
 columns_to_drop = ["_Gen_ID", "Context_Others", "has_context"]
-df.drop(columns=columns_to_drop, errors="ignore", inplace=True)
+df = drop_columns_if_present(df, columns_to_drop)
 
 # %%
 # === 3. Ordinal Encode Product Profile Variation Columns ===

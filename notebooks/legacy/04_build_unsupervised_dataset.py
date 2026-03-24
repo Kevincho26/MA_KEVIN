@@ -29,6 +29,7 @@ import pandas as pd
 # %%
 # === 1. Load Merged Clean Dataset ===
 from src.data.loaders import load_base_dataset
+from src.features.preprocessing import drop_columns_if_present
 from src.utils.paths import PROCESSED_DIR
 
 PROCESSED_DIR.mkdir(parents=True, exist_ok=True)
@@ -37,8 +38,8 @@ df = load_base_dataset().copy()
 
 # %%
 # === 2. Drop target and irrelevant variables ===
-drop_columns = ["_Success_qual", "_Gen_ID", "Context_Others", "has_context"]
-df.drop(columns=drop_columns, inplace=True, errors="ignore")
+columns_to_drop = ["_Success_qual", "_Gen_ID", "Context_Others", "has_context"]
+df = drop_columns_if_present(df, columns_to_drop)
 
 # %%
 # === 3. Encode Product Profile Variation (ordinal: CV < AV < PV) ===

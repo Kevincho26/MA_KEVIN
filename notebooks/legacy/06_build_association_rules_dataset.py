@@ -30,6 +30,7 @@ import pandas as pd
 # %%
 # Load dataset prepared for unsupervised learning
 from src.data.loaders import load_unsupervised_base_dataset
+from src.features.preprocessing import drop_columns_if_present
 from src.utils.paths import PROCESSED_DIR
 
 PROCESSED_DIR.mkdir(parents=True, exist_ok=True)
@@ -53,7 +54,8 @@ for col in variation_cols:
         mapped = df[col].map(variation_value_map)
         for label in ["CV", "AV", "PV"]:
             df[f"{col}_{label}"] = (mapped == label).astype(int)
-        df.drop(columns=[col], inplace=True)
+
+        df = drop_columns_if_present(df, [col])
 
 # %%
 # Discretize continuous technical variables into binary bins
@@ -73,7 +75,8 @@ for col in continuous_cols:
         df[f"{col}_low"] = (series < 0.33).astype(int)
         df[f"{col}_med"] = ((series >= 0.33) & (series < 0.66)).astype(int)
         df[f"{col}_high"] = (series >= 0.66).astype(int)
-        df.drop(columns=[col], inplace=True)
+
+        df = drop_columns_if_present(df, [col])
 
 # %%
 # Convert generation to binned categories
@@ -86,7 +89,7 @@ if "_Generation" in df.columns:
     for label in labels:
         df[f"Generation_{label}"] = (generation_cat == label).astype(int)
 
-    df.drop(columns=["_Generation"], inplace=True)
+    df = drop_columns_if_present(df, ["_Generation"])
 
 # %%
 # One-hot encode remaining contextual ordinal columns
@@ -94,8 +97,9 @@ contextual_cols = [col for col in df.columns if not col.startswith("_")]
 
 # %%
 for col in contextual_cols:
-    dummies = pd.get_dummies(df[col].astype(str), prefix=col)
-    df = pd.concat([df.drop(columns=[col]), dummies], axis=1)
+    if col in df.columns:
+        dummies = pd.get_dummies(df[col].astype(str), prefix=col)
+        df = pd.concat([drop_columns_if_present(df, [col]), dummies], axis=1)
 
 # %%
 # Final check: ensure all variables are binary (0/1)

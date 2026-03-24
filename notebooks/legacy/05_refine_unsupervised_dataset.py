@@ -29,6 +29,7 @@ from sklearn.preprocessing import StandardScaler
 # %%
 # Load dataset prepared for unsupervised learning
 from src.data.loaders import load_unsupervised_base_dataset
+from src.features.preprocessing import drop_columns_if_present
 from src.utils.paths import PROCESSED_DIR
 
 PROCESSED_DIR.mkdir(parents=True, exist_ok=True)
@@ -37,8 +38,8 @@ df = load_unsupervised_base_dataset().copy()
 
 # %%
 # Drop redundant or complementary variables
-columns_to_remove = ["_δCV", "_δND", "_share_RSE_internal"]
-df.drop(columns=[col for col in columns_to_remove if col in df.columns], inplace=True)
+columns_to_drop = ["_δCV", "_δND", "_share_RSE_internal"]
+df = drop_columns_if_present(df, columns_to_drop)
 
 # %%
 # Standardize relevant numerical columns for unsupervised models
