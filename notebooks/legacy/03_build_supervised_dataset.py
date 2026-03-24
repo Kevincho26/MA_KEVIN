@@ -30,6 +30,7 @@ import pandas as pd
 # %%
 # === 1. Load Merged Clean Dataset ===
 from src.data.loaders import load_base_dataset
+from src.features.engineering import encode_ordinal_columns
 from src.features.preprocessing import drop_columns_if_present
 from src.utils.paths import PROCESSED_DIR
 
@@ -52,8 +53,7 @@ variation_cols = [
 ]
 
 # %%
-for col in variation_cols:
-    df[col] = df[col].map(variation_map).astype(int)
+df = encode_ordinal_columns(df, variation_cols, variation_map)
 
 # %%
 # === 4. Ordinal Encode Contextual Variables (high > low > 0) ===
@@ -66,8 +66,7 @@ contextual_cols = df.columns.difference(
 
 # %%
 contextual_map = {"0": 0, "low": 1, "high": 2}
-for col in contextual_cols:
-    df[col] = df[col].map(contextual_map).astype(int)
+df = encode_ordinal_columns(df, contextual_cols, contextual_map)
 
 # %%
 # === 5. Binarize the target variable ===

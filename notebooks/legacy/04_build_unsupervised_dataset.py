@@ -29,6 +29,7 @@ import pandas as pd
 # %%
 # === 1. Load Merged Clean Dataset ===
 from src.data.loaders import load_base_dataset
+from src.features.engineering import encode_ordinal_columns
 from src.features.preprocessing import drop_columns_if_present
 from src.utils.paths import PROCESSED_DIR
 
@@ -49,9 +50,7 @@ profile_vars = [
     "_Provider_Benefit_Variation",
     "_Customer_Benefit_Variation",
 ]
-for col in profile_vars:
-    if col in df.columns:
-        df[col] = df[col].map(variation_map).astype(int)
+df = encode_ordinal_columns(df, profile_vars, variation_map)
 
 # %%
 # === 4. Encode Contextual Variables (ordinal: 0 < low < high) ===
@@ -67,9 +66,12 @@ contextual_vars = [
     "Technology",
 ]
 context_map = {"0": 0, "low": 1, "high": 2}
-for col in contextual_vars:
-    if col in df.columns:
-        df[col] = df[col].astype(str).map(context_map).astype(int)
+df = encode_ordinal_columns(
+    df,
+    contextual_vars,
+    context_map,
+    coerce_to_string=True,
+)
 
 # %%
 # === 5. Export dataset ===
