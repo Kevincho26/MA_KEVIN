@@ -25,12 +25,13 @@ This script refines the unsupervised dataset generated from the base pipeline by
 """
 
 # %%
-import pandas as pd
-
-# %%
 # Load dataset prepared for unsupervised learning
 from src.data.loaders import load_unsupervised_base_dataset
-from src.features.preprocessing import drop_columns_if_present
+from src.features.engineering import (
+    bin_numeric_column_to_indicators,
+    expand_mapped_indicator_columns,
+    one_hot_encode_columns,
+)
 from src.utils.paths import PROCESSED_DIR
 
 PROCESSED_DIR.mkdir(parents=True, exist_ok=True)
@@ -48,14 +49,13 @@ variation_cols = [
 # %%
 variation_value_map = {0: "CV", 1: "AV", 2: "PV"}
 
-# %%
 for col in variation_cols:
-    if col in df.columns:
-        mapped = df[col].map(variation_value_map)
-        for label in ["CV", "AV", "PV"]:
-            df[f"{col}_{label}"] = (mapped == label).astype(int)
-
-        df = drop_columns_if_present(df, [col])
+    df = expand_mapped_indicator_columns(
+        df,
+        source_column=col,
+        value_map=variation_value_map,
+        labels=["CV", "AV", "PV"],
+    )
 
 # %%
 # Discretize continuous technical variables into binary bins
@@ -70,36 +70,31 @@ continuous_cols = [
 
 # %%
 for col in continuous_cols:
-    if col in df.columns:
-        series = pd.to_numeric(df[col], errors="coerce")
-        df[f"{col}_low"] = (series < 0.33).astype(int)
-        df[f"{col}_med"] = ((series >= 0.33) & (series < 0.66)).astype(int)
-        df[f"{col}_high"] = (series >= 0.66).astype(int)
-
-        df = drop_columns_if_present(df, [col])
+    df = bin_numeric_column_to_indicators(
+        df,
+        source_column=col,
+        bins=[float("-inf"), 0.33, 0.66, float("inf")],
+        labels=["low", "med", "high"],
+        prefix=col,
+        right=False,
+    )
 
 # %%
 # Convert generation to binned categories
-if "_Generation" in df.columns:
-    generation = pd.to_numeric(df["_Generation"], errors="coerce")
-    bins = [0, 5, 10, 20]
-    labels = ["early", "mid", "late"]
-    generation_cat = pd.cut(generation, bins=bins, labels=labels)
-
-    for label in labels:
-        df[f"Generation_{label}"] = (generation_cat == label).astype(int)
-
-    df = drop_columns_if_present(df, ["_Generation"])
+df = bin_numeric_column_to_indicators(
+    df,
+    source_column="_Generation",
+    bins=[0, 5, 10, 20],
+    labels=["early", "mid", "late"],
+    prefix="Generation",
+)
 
 # %%
 # One-hot encode remaining contextual ordinal columns
 contextual_cols = [col for col in df.columns if not col.startswith("_")]
 
 # %%
-for col in contextual_cols:
-    if col in df.columns:
-        dummies = pd.get_dummies(df[col].astype(str), prefix=col)
-        df = pd.concat([drop_columns_if_present(df, [col]), dummies], axis=1)
+df = one_hot_encode_columns(df, contextual_cols)
 
 # %%
 # Final check: ensure all variables are binary (0/1)
