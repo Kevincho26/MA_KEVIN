@@ -1,6 +1,6 @@
 # Legacy pipeline notebooks
 
-This document describes the current state of the legacy pipeline after the stabilization, naming cleanup, notebook synchronization, and initial migration of shared utilities into `src/`.
+This document describes the current state of the legacy pipeline after the naming cleanup, notebook synchronization, and the ongoing migration of shared logic into `src/`.
 
 ## Purpose
 
@@ -10,33 +10,25 @@ The `notebooks/legacy/` directory preserves the original thesis workflow for:
 - exploratory analysis
 - supervised modeling
 - unsupervised modeling
+- association-rule preparation
 
-During the recent cleanup and migration phases, the goals were to:
-
-- professionalize notebook and dataset names
-- remove absolute paths tied to a specific local machine
-- stabilize `.py` / `.ipynb` synchronization with Jupytext
-- centralize shared repository paths
-- centralize canonical processed dataset loading
-- leave a clearer baseline for future extraction of reusable logic into `src/`
+At the same time, the repository is gradually moving repeated notebook logic into reusable modules under `src/`.
 
 ---
 
 ## Scope
 
-The main notebooks covered by this document are located in:
+This document covers the notebooks located in:
 
 ```text
 notebooks/legacy/
 ```
 
-The `notebooks/archive/` directory was left out of this phase and is not yet part of the formally documented workflow.
+The `notebooks/archive/` directory remains outside the active documented workflow and should be treated as archival material.
 
 ---
 
-## Naming convention
-
-The legacy notebooks follow this convention.
+## Notebook naming convention
 
 ### Data pipeline / preparation
 
@@ -60,16 +52,14 @@ The legacy notebooks follow this convention.
 - `21_hierarchical_clustering`
 - `22_autoencoder_anomaly_detection`
 
-Each notebook keeps its synchronized pair in:
+Each notebook is intended to remain synchronized in both formats:
 
 - `.py`
 - `.ipynb`
 
 ---
 
-## Current dataset names
-
-These are the current canonical names of the datasets generated in the legacy pipeline.
+## Canonical processed dataset names
 
 | Previous name | Current name |
 |---|---|
@@ -79,13 +69,13 @@ These are the current canonical names of the datasets generated in the legacy pi
 | `processed_unsupervised.csv` | `unsupervised_modeling_dataset.csv` |
 | `processed_unsupervised_apriori.csv` | `association_rules_dataset.csv` |
 
-The files are generated under:
+These datasets are generated under:
 
 ```text
 data/processed/
 ```
 
-These datasets should be treated as **derived artifacts** of the pipeline, not as manually maintained source-of-truth files.
+They should be treated as derived pipeline artifacts, not manually maintained source-of-truth files.
 
 ---
 
@@ -95,32 +85,32 @@ These datasets should be treated as **derived artifacts** of the pipeline, not a
 
 ```text
 raw data
-   ↓
+  ↓
 01_build_base_dataset
-   ↓
+  ↓
 base_dataset.csv
-   ├─→ 02_exploratory_data_analysis
-   ├─→ 03_build_supervised_dataset
-   │      ↓
-   │   supervised_modeling_dataset.csv
-   │      ├─→ 10_logistic_regression
-   │      ├─→ 11_decision_tree
-   │      ├─→ 12_random_forest
-   │      └─→ 13_xgboost
-   │
-   └─→ 04_build_unsupervised_dataset
-          ↓
-       unsupervised_base_dataset.csv
-          ├─→ 05_refine_unsupervised_dataset
-          │      ↓
-          │   unsupervised_modeling_dataset.csv
-          │      ├─→ 20_dbscan
-          │      ├─→ 21_hierarchical_clustering
-          │      └─→ 22_autoencoder_anomaly_detection
-          │
-          └─→ 06_build_association_rules_dataset
-                 ↓
-              association_rules_dataset.csv
+  ├─→ 02_exploratory_data_analysis
+  ├─→ 03_build_supervised_dataset
+  │     ↓
+  │   supervised_modeling_dataset.csv
+  │     ├─→ 10_logistic_regression
+  │     ├─→ 11_decision_tree
+  │     ├─→ 12_random_forest
+  │     └─→ 13_xgboost
+  │
+  └─→ 04_build_unsupervised_dataset
+        ↓
+      unsupervised_base_dataset.csv
+        ├─→ 05_refine_unsupervised_dataset
+        │     ↓
+        │   unsupervised_modeling_dataset.csv
+        │     ├─→ 20_dbscan
+        │     ├─→ 21_hierarchical_clustering
+        │     └─→ 22_autoencoder_anomaly_detection
+        │
+        └─→ 06_build_association_rules_dataset
+              ↓
+            association_rules_dataset.csv
 ```
 
 ---
@@ -138,6 +128,9 @@ base_dataset.csv
 **Purpose**
 - consolidate and prepare the base dataset used by the rest of the pipeline
 
+**Note**
+- this is the pipeline entry point and still reads raw source files directly
+
 ---
 
 ### 02_exploratory_data_analysis
@@ -149,7 +142,7 @@ base_dataset.csv
 - no canonical dataset output
 
 **Purpose**
-- explore structure, distributions, and initial patterns in the base dataset
+- explore structure, distributions, relationships, and initial patterns in the base dataset
 
 ---
 
@@ -162,7 +155,7 @@ base_dataset.csv
 - `data/processed/supervised_modeling_dataset.csv`
 
 **Purpose**
-- build the final dataset used by the supervised modeling notebooks
+- prepare the dataset used by supervised modeling notebooks
 
 **Consumed by**
 - `10_logistic_regression`
@@ -181,7 +174,7 @@ base_dataset.csv
 - `data/processed/unsupervised_base_dataset.csv`
 
 **Purpose**
-- build an intermediate dataset oriented toward unsupervised analysis
+- prepare the intermediate dataset used by the unsupervised pipeline
 
 ---
 
@@ -201,9 +194,6 @@ base_dataset.csv
 - `21_hierarchical_clustering`
 - `22_autoencoder_anomaly_detection`
 
-**Note**
-- some unsupervised notebooks also use `base_dataset.csv` as additional context for interpreting results
-
 ---
 
 ### 06_build_association_rules_dataset
@@ -215,7 +205,7 @@ base_dataset.csv
 - `data/processed/association_rules_dataset.csv`
 
 **Purpose**
-- generate the dataset specifically used for association rules
+- transform the unsupervised base dataset into a binary association-rules dataset
 
 ---
 
@@ -245,38 +235,13 @@ base_dataset.csv
 
 ---
 
-## Portable paths
+## Reusable project modules under `src/`
 
-To avoid dependencies on absolute Windows paths, notebooks/scripts were migrated to a portable pattern based on `Path` and repository root detection.
-
-Reference pattern:
-
-```python
-from pathlib import Path
-
-def find_repo_root(start: Path | None = None) -> Path:
-    start = (start or Path.cwd()).resolve()
-    for candidate in [start, *start.parents]:
-        if (candidate / "notebooks").exists() and (candidate / "data").exists():
-            return candidate
-    raise FileNotFoundError("Could not find repository root.")
-
-REPO_ROOT = find_repo_root()
-PROCESSED_DIR = REPO_ROOT / "data" / "processed"
-RAW_DIR = REPO_ROOT / "data" / "raw"
-```
-
-This pattern should be preserved in future notebooks and scripts that still depend on hardcoded paths.
-
----
-
-## Reusable project modules
-
-As part of the legacy-to-`src/` migration, some shared project utilities were extracted from notebooks into reusable Python modules.
+As part of the migration away from notebook-local infrastructure, shared logic has been extracted into reusable modules.
 
 ### Repository paths
 
-Shared repository paths are now centralized in:
+Shared repository path resolution is centralized in:
 
 ```text
 src/utils/paths.py
@@ -285,22 +250,27 @@ src/utils/paths.py
 This module provides reusable path objects such as:
 
 - `REPO_ROOT`
+- `DATA_DIR`
 - `RAW_DIR`
+- `INTERIM_DIR`
 - `PROCESSED_DIR`
-- `DOCS_DIR`
+- `EXTERNAL_DIR`
 - `NOTEBOOKS_DIR`
+- `SRC_DIR`
+- `DOCS_DIR`
+- `REPORTS_DIR`
 
-Legacy notebooks should import these paths instead of redefining local path discovery logic.
+Legacy notebooks should import shared paths from this module instead of redefining local repository-root detection.
 
 ### Dataset loaders
 
-Canonical processed datasets are now loaded through:
+Canonical processed datasets are loaded through:
 
 ```text
 src/data/loaders.py
 ```
 
-This module currently provides:
+Current loaders include:
 
 - `load_base_dataset()`
 - `load_supervised_modeling_dataset()`
@@ -308,36 +278,98 @@ This module currently provides:
 - `load_unsupervised_modeling_dataset()`
 - `load_association_rules_dataset()`
 
-This reduces repeated `pd.read_csv(...)` calls and centralizes processed dataset access.
+This removes repeated manual reads of canonical processed CSVs.
 
-### Current migration status
+### Preprocessing helpers
 
-At this stage, legacy notebooks that consume canonical processed datasets have been updated to use shared loaders.
+Reusable preprocessing helpers are currently centralized in:
 
-As a result:
+```text
+src/features/preprocessing.py
+```
 
-- repository path resolution is centralized in `src/utils/paths.py`
-- canonical processed dataset loading is centralized in `src/data/loaders.py`
+Current helpers include:
 
-The main exception is `01_build_base_dataset`, which still reads raw source files directly because it is the pipeline entry point that generates `base_dataset.csv`.
+- `drop_columns_if_present()`
+- `split_features_and_target()`
+- `select_numeric_columns()`
+
+These helpers are already used in several pipeline and supervised-model notebooks.
+
+### Feature engineering helpers
+
+Reusable feature-engineering helpers are now centralized in:
+
+```text
+src/features/engineering.py
+```
+
+Current helpers include:
+
+- `expand_mapped_indicator_columns()`
+- `bin_numeric_column_to_indicators()`
+- `one_hot_encode_columns()`
+- `encode_ordinal_columns()`
+
+These helpers are intended to remove repeated notebook-local logic for:
+
+- indicator expansion from coded categorical variables
+- numeric binning into indicator columns
+- one-hot encoding of contextual variables
+- repeated ordinal encoding across multiple columns
+
+### Feature exports
+
+Shared feature helpers are re-exported through:
+
+```text
+src/features/__init__.py
+```
+
+This provides a cleaner public surface for the feature-related utilities currently extracted from the legacy notebooks.
+
+---
+
+## Current migration status
+
+At this stage, the legacy workflow has already been partially migrated away from notebook-local infrastructure.
+
+### Already centralized
+
+- repository path resolution in `src/utils/paths.py`
+- canonical processed dataset access in `src/data/loaders.py`
+- selected preprocessing helpers in `src/features/preprocessing.py`
+- initial feature-engineering helpers in `src/features/engineering.py`
+
+### Already applied in legacy notebooks
+
+- notebooks consuming canonical processed datasets now use shared loaders
+- several supervised notebooks use shared preprocessing helpers
+- `06_build_association_rules_dataset` uses shared feature-engineering helpers
+- `03_build_supervised_dataset` and `04_build_unsupervised_dataset` use shared ordinal-encoding logic
+
+### Main exception
+
+- `01_build_base_dataset` still reads raw source files directly because it is the pipeline entry point
 
 ---
 
 ## Jupytext and `.py` / `.ipynb` synchronization
 
-The legacy notebooks are intended to remain synchronized in both formats:
+Legacy notebooks are intended to remain synchronized in both representations:
 
 - `.py`
 - `.ipynb`
 
-Synchronization is handled with Jupytext.
+Synchronization is handled through Jupytext, while notebook cleanup is enforced through pre-commit hooks.
 
 ### Practical workflow
 
-1. edit file
-2. run hooks / `pre-commit`
-3. run `git add` again if hooks modified files
+1. edit notebook or paired script
+2. run the file if needed
+3. run `git add`
 4. commit
+5. if hooks rewrite files, run `git add` again and repeat commit
 
 ### Tools involved
 
@@ -350,11 +382,11 @@ Synchronization is handled with Jupytext.
 ### Useful commands
 
 ```bash
-jupytext --sync notebooks/legacy/*.py
+jupytext --sync notebooks/legacy/*.ipynb
 pre-commit run --all-files
 ```
 
-When hooks rewrite files, the typical flow is:
+When hooks rewrite files, the normal flow is:
 
 ```bash
 git add .
@@ -365,59 +397,46 @@ git commit
 
 ---
 
-## Current notebook/script pair status
+## Running notebooks/scripts from terminal
 
-During this phase, missing `.ipynb` pairs were created and all relevant legacy notebooks were aligned with Jupytext.
+When legacy notebook scripts are executed directly from the repository root, imports from `src` may require setting `PYTHONPATH` explicitly for the session.
 
-The goal is for all relevant legacy notebooks to remain consistent with Jupytext.
+### PowerShell example
+
+```powershell
+$env:PYTHONPATH = (Get-Location).Path
+python .\notebooks\legacy\03_build_supervised_dataset.py
+python .\notebooks\legacy\04_build_unsupervised_dataset.py
+python .\notebooks\legacy\06_build_association_rules_dataset.py
+```
+
+This is useful when running notebook-paired `.py` files directly without packaging the repository as an installed module.
 
 ---
 
 ## Known limitations
 
-This phase focused on naming, structure, and stability of the legacy workflow, plus initial extraction of shared utilities into `src/`. Several technical issues were intentionally left for later, since they do not block this documented state.
+This phase focused on structure, reuse, and stability of the legacy workflow. Several issues were intentionally left for later.
 
 ### Environment dependencies
 
-- `tensorflow` missing in `22_autoencoder_anomaly_detection.py`
-- `imblearn` missing in `10_logistic_regression.py`
+- `tensorflow` may still be required for `22_autoencoder_anomaly_detection.py`
+- `imblearn` may still be required for `10_logistic_regression.py`
 
-### Warnings and technical cleanup
+### Technical cleanup still pending
 
-- seaborn warnings caused by using `palette` without `hue`
-- MKL / OpenMP / `KMeans` warnings on Windows
-- column names with encoding artifacts such as `_Î´`
-- large notebooks containing duplicated experiment versions
+- seaborn warnings in plotting code
+- MKL / OpenMP / clustering warnings on Windows
+- column names with encoding artifacts in some notebooks
+- large notebooks with duplicated experiment sections
+- modeling and evaluation logic still mostly notebook-local
 
-### Architecture
+### Architecture still pending
 
-- reusable logic has not yet been seriously migrated into `src/features/` or `src/models/`
-- there is still no full centralization of preprocessing, feature engineering, or training/evaluation helpers
+The repository has already started centralizing `src/features`, but there is still room to continue extracting reusable logic into modules such as:
 
-### Pending archive status
-
-- `notebooks/archive/` still has no formal analytical role in the active workflow
-- its current purpose is archival/documentary only
-
----
-
-## Recommended next phase
-
-The natural next step after this document is to continue the gradual migration of reusable logic into `src/`.
-
-A reasonable next sequence would be:
-
-- `src/features/preprocessing.py`
-- `src/features/engineering.py`
 - `src/models/train.py`
 - `src/models/evaluate.py`
-
-At the same time, future cleanup may include:
-
-1. deciding the long-term status of `notebooks/archive/`
-2. refining environment reproducibility
-3. addressing warnings and duplicated experimental code
-4. moving stable feature engineering and preprocessing logic out of notebooks
 
 ---
 
@@ -428,22 +447,24 @@ At the same time, future cleanup may include:
 ```powershell
 git status
 git log --oneline -10
-Get-ChildItem notebooks\legacy
-Get-ChildItem data\processed
+git grep -n "pd.get_dummies\|pd.cut\|map(" -- "notebooks/legacy/*.py"
+Get-ChildItem src
+Get-ChildItem src\features
 ```
 
 ---
 
 ## Summary
 
-The legacy pipeline is now in a more stable and professional state in terms of:
+The legacy pipeline is now in a more reusable and portable state in terms of:
 
 - notebook naming
 - dataset naming
 - path portability
-- Jupytext consistency
+- synchronized notebook/script pairs
 - reusable repository paths
 - reusable dataset loaders
-- basic traceability between pipeline stages
+- reusable preprocessing helpers
+- initial reusable feature-engineering helpers
 
-This README documents that state as the baseline before further migration of reusable preprocessing, feature engineering, and modeling logic into `src/`.
+This README documents that updated baseline for future migration work.
