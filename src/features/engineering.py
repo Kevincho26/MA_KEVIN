@@ -89,3 +89,22 @@ def one_hot_encode_columns(
         result = pd.concat([result, dummies], axis=1)
 
     return result
+
+
+def encode_ordinal_columns(
+    df: pd.DataFrame,
+    columns: Sequence[str],
+    value_map: Mapping[object, int],
+    coerce_to_string: bool = False,
+) -> pd.DataFrame:
+    """Encode multiple columns with the same ordinal mapping."""
+    result = df.copy()
+
+    for column in columns:
+        if column not in result.columns:
+            continue
+
+        series = result[column].astype(str) if coerce_to_string else result[column]
+        result[column] = series.map(value_map).astype(int)
+
+    return result

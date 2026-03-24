@@ -18,4 +18,9 @@ __all__ = [
     "one_hot_encode_columns",
     "select_numeric_columns",
     "split_features_and_target",
+    "encode_ordinal_columns",
 ]
+
+from src.features.engineering import (
+    encode_ordinal_columns,
+)
