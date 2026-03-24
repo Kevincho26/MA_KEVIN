@@ -16,6 +16,7 @@ import pandas as pd
 import seaborn as sns
 
 from src.data.loaders import load_base_dataset
+from src.features.engineering import encode_ordinal_columns
 
 # Load preprocessed dataset
 df = load_base_dataset()
@@ -720,8 +721,7 @@ contextual_cols = [
 # Ordinal encoding for contextual variables
 ordinal_map = {"0": 0, "low": 1, "high": 2}
 df_encoded = df.copy()
-for col in contextual_cols:
-    df_encoded[col] = df_encoded[col].map(ordinal_map)
+df_encoded = encode_ordinal_columns(df_encoded, contextual_cols, ordinal_map)
 
 # Combine features
 combined_cols = technical_cols + contextual_cols
@@ -836,8 +836,7 @@ contextual_cols = [
 # Ordinal encoding for contextual variables
 ordinal_map = {"0": 0, "low": 1, "high": 2}
 df_encoded = df.copy()
-for col in contextual_cols:
-    df_encoded[col] = df_encoded[col].map(ordinal_map)
+df_encoded = encode_ordinal_columns(df_encoded, contextual_cols, ordinal_map)
 
 # --- PCA 1: Technical only ---
 X_tech = df[technical_cols]
@@ -975,8 +974,7 @@ meta_cols = ["has_context"]
 # Ordinal encode contextual features
 ordinal_map = {"0": 0, "low": 1, "high": 2}
 df_encoded = df.copy()
-for col in contextual_cols:
-    df_encoded[col] = df_encoded[col].map(ordinal_map)
+df_encoded = encode_ordinal_columns(df_encoded, contextual_cols, ordinal_map)
 
 # Prepare data for classification
 X = df_encoded[technical_cols + contextual_cols + meta_cols]
@@ -1057,8 +1055,7 @@ contextual_cols = [
 ]
 ordinal_map = {"0": 0, "low": 1, "high": 2}
 df_encoded = df.copy()
-for col in contextual_cols:
-    df_encoded[col] = df_encoded[col].map(ordinal_map)
+df_encoded = encode_ordinal_columns(df_encoded, contextual_cols, ordinal_map)
 
 features = technical_cols + contextual_cols
 X = df_encoded[features]
