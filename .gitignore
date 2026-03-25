@@ -18,9 +18,14 @@ __pycache__/
 data/raw/
 data/interim/
 
-# Model outputs / reports (opcional)
-models/
-reports/figures/
+# Model outputs / reports (solo en la raíz del repo)
+# Importante: anclado con "/" para no ignorar src/models/
+/models/
+/reports/figures/
+
+# Asegurar que el código fuente de modelos sí se pueda versionar
+!src/models/
+!src/models/**
 
 # Clean rename
 data/processed/*.csv
