@@ -26,12 +26,11 @@ import matplotlib.pyplot as plt
 import pandas as pd
 import seaborn as sns
 from sklearn.linear_model import LogisticRegression
-from sklearn.model_selection import train_test_split
-from sklearn.preprocessing import StandardScaler
 
 from src.data.loaders import load_supervised_modeling_dataset
 from src.features.preprocessing import drop_columns_if_present, split_features_and_target
 from src.models.evaluation import evaluate_binary_classifier
+from src.models.splitting import scale_train_test, split_supervised_data
 
 # === 2. Load Supervised Modeling Dataset ===
 df = load_supervised_modeling_dataset()
@@ -42,14 +41,10 @@ colinear_vars = ["_δND", "_share_RSE_internal"]
 X, y = split_features_and_target(df, "_Success_qual")
 X = drop_columns_if_present(X, colinear_vars)
 
-X_train, X_test, y_train, y_test = train_test_split(
-    X, y, test_size=0.3, random_state=42, stratify=y
-)
+X_train, X_test, y_train, y_test = split_supervised_data(X, y)
 
 # === 4. Scale Features ===
-scaler = StandardScaler()
-X_train_scaled = scaler.fit_transform(X_train)
-X_test_scaled = scaler.transform(X_test)
+X_train_scaled, X_test_scaled, scaler = scale_train_test(X_train, X_test)
 
 # === 5. Train Logistic Regression Model ===
 model = LogisticRegression(class_weight="balanced", random_state=42, max_iter=1000)
