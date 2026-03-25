@@ -34,7 +34,6 @@ from sklearn.metrics import (
     roc_auc_score,
     roc_curve,
 )
-from sklearn.model_selection import train_test_split
 
 from src.data.loaders import load_supervised_modeling_dataset
 from src.features.preprocessing import drop_columns_if_present, split_features_and_target
@@ -43,6 +42,7 @@ from src.models.interpretation import (
     plot_feature_importance,
     prepare_feature_importance_df,
 )
+from src.models.splitting import split_supervised_data
 
 # === 2. Load Preprocessed Supervised Dataset ===
 df = load_supervised_modeling_dataset()
@@ -52,9 +52,7 @@ colinear_vars = ["_δND", "_share_RSE_internal"]
 X, y = split_features_and_target(df, "_Success_qual")
 X = drop_columns_if_present(X, colinear_vars)
 
-X_train, X_test, y_train, y_test = train_test_split(
-    X, y, test_size=0.3, random_state=42, stratify=y
-)
+X_train, X_test, y_train, y_test = split_supervised_data(X, y)
 
 # === 4. Train Basic Random Forest ===
 model = RandomForestClassifier(random_state=42)
@@ -80,7 +78,6 @@ plot_feature_importance(
     title="Feature Importance (Random Forest Basic)",
 )
 
-
 # %% [markdown]
 # ## 2. Random Forest: Class Weight Balanced
 
@@ -97,9 +94,7 @@ colinear_vars = ["_δND", "_share_RSE_internal"]
 X, y = split_features_and_target(df, "_Success_qual")
 X = drop_columns_if_present(X, colinear_vars)
 
-X_train, X_test, y_train, y_test = train_test_split(
-    X, y, test_size=0.3, random_state=42, stratify=y
-)
+X_train, X_test, y_train, y_test = split_supervised_data(X, y)
 
 # === 4. Train Random Forest with Class Weight Balanced ===
 model = RandomForestClassifier(random_state=42, n_estimators=100, class_weight="balanced")
@@ -125,7 +120,6 @@ plot_feature_importance(
     title="Feature Importance (Random Forest v2 - Balanced)",
 )
 
-
 # %% [markdown]
 # ## 3. Random Forest: SMOTE
 
@@ -133,7 +127,6 @@ plot_feature_importance(
 # === 1. Imports and Setup ===
 from imblearn.over_sampling import SMOTE
 from sklearn.ensemble import RandomForestClassifier
-from sklearn.model_selection import train_test_split
 
 # === 2. Load Preprocessed Supervised Dataset ===
 df = load_supervised_modeling_dataset()
@@ -143,9 +136,7 @@ colinear_vars = ["_δND", "_share_RSE_internal"]
 X, y = split_features_and_target(df, "_Success_qual")
 X = drop_columns_if_present(X, colinear_vars)
 
-X_train, X_test, y_train, y_test = train_test_split(
-    X, y, test_size=0.3, random_state=42, stratify=y
-)
+X_train, X_test, y_train, y_test = split_supervised_data(X, y)
 
 # === 4. Apply SMOTE on Training Data Only ===
 smote = SMOTE(random_state=42)
@@ -175,7 +166,6 @@ plot_feature_importance(
     title="Feature Importance (Random Forest SMOTE)",
 )
 
-
 # %% [markdown]
 # ## 4. Random Forest: SMOTE + Class Weight + Threshold
 
@@ -187,7 +177,6 @@ plot_feature_importance(
 
 from imblearn.over_sampling import SMOTE
 from sklearn.ensemble import RandomForestClassifier
-from sklearn.model_selection import train_test_split
 
 # === 2. Load Preprocessed Supervised Dataset ===
 df = load_supervised_modeling_dataset()
@@ -197,9 +186,7 @@ colinear_vars = ["_δND", "_share_RSE_internal"]
 X, y = split_features_and_target(df, "_Success_qual")
 X = drop_columns_if_present(X, colinear_vars)
 
-X_train, X_test, y_train, y_test = train_test_split(
-    X, y, test_size=0.3, random_state=42, stratify=y
-)
+X_train, X_test, y_train, y_test = split_supervised_data(X, y)
 
 # === 4. Apply SMOTE on Training Data Only ===
 smote = SMOTE(random_state=42)
