@@ -340,6 +340,7 @@ Current model-related modules include:
 
 - `src/models/evaluation.py`
 - `src/models/interpretation.py`
+- `src/models/splitting.py`
 - `src/models/__init__.py`
 
 Current reusable helpers include:
@@ -347,6 +348,10 @@ Current reusable helpers include:
 - `evaluate_binary_classifier()`
 - `prepare_feature_importance_df()`
 - `plot_feature_importance()`
+- `prepare_coefficient_df()`
+- `plot_coefficients()`
+- `split_supervised_data()`
+- `scale_train_test()`
 
 These helpers currently centralize repeated supervised-model notebook logic for:
 
@@ -354,6 +359,10 @@ These helpers currently centralize repeated supervised-model notebook logic for:
 - confusion matrix and ROC plotting
 - feature-importance dataframe preparation
 - feature-importance plotting and top-feature reporting
+- coefficient dataframe preparation for logistic regression
+- coefficient plotting and top-coefficient reporting
+- supervised train/test splitting
+- train/test scaling with shared fitted scaler state
 
 ### Model exports
 
@@ -379,6 +388,8 @@ At this stage, the legacy workflow has already been partially migrated away from
 - initial feature-engineering helpers in `src/features/engineering.py`
 - binary-classification evaluation helpers in `src/models/evaluation.py`
 - feature-importance preparation and plotting helpers in `src/models/interpretation.py`
+- coefficient preparation and plotting helpers in `src/models/interpretation.py`
+- supervised split and scaling helpers in `src/models/splitting.py`
 
 ### Already applied in legacy notebooks
 
@@ -386,8 +397,8 @@ At this stage, the legacy workflow has already been partially migrated away from
 - several supervised notebooks use shared preprocessing helpers
 - `06_build_association_rules_dataset` uses shared feature-engineering helpers
 - `03_build_supervised_dataset` and `04_build_unsupervised_dataset` use shared ordinal-encoding logic
-- `10_logistic_regression` reuses the shared binary-classification evaluation helper
-- `11_decision_tree`, `12_random_forest`, and `13_xgboost` reuse both shared evaluation and feature-importance helpers
+- `10_logistic_regression` reuses shared split, scaling, evaluation, and coefficient-interpretation helpers
+- `11_decision_tree`, `12_random_forest`, and `13_xgboost` reuse shared split, evaluation, and feature-importance helpers
 
 ### Main exception
 
@@ -477,7 +488,6 @@ This phase focused on structure, reuse, and stability of the legacy workflow. Se
 The repository has already started centralizing `src/features` and `src/models`, but there is still room to continue extracting reusable logic into modules such as:
 
 - `src/models/train.py`
-- `src/models/splitting.py`
 - `src/models/tuning.py`
 
 ---
@@ -511,5 +521,7 @@ The legacy pipeline is now in a more reusable and portable state in terms of:
 - reusable feature-engineering helpers
 - reusable model-evaluation helpers
 - reusable feature-importance helpers
+- reusable coefficient-interpretation helpers
+- reusable supervised split and scaling helpers
 
 This README documents that updated baseline for future migration work.
