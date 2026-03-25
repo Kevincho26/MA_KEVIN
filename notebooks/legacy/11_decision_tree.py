@@ -31,7 +31,6 @@ from sklearn.metrics import (
     roc_auc_score,
     roc_curve,
 )
-from sklearn.model_selection import train_test_split
 from sklearn.tree import DecisionTreeClassifier, plot_tree
 
 from src.data.loaders import load_supervised_modeling_dataset
@@ -41,6 +40,7 @@ from src.models.interpretation import (
     plot_feature_importance,
     prepare_feature_importance_df,
 )
+from src.models.splitting import split_supervised_data
 
 # === 2. Load Preprocessed Supervised Dataset ===
 df = load_supervised_modeling_dataset()
@@ -50,9 +50,7 @@ colinear_vars = ["_δND", "_share_RSE_internal"]
 X, y = split_features_and_target(df, "_Success_qual")
 X = drop_columns_if_present(X, colinear_vars)
 
-X_train, X_test, y_train, y_test = train_test_split(
-    X, y, test_size=0.3, random_state=42, stratify=y
-)
+X_train, X_test, y_train, y_test = split_supervised_data(X, y)
 
 # === 4. Train Basic Decision Tree ===
 model = DecisionTreeClassifier(random_state=42)
@@ -118,9 +116,7 @@ colinear_vars = ["_δND", "_share_RSE_internal"]
 X, y = split_features_and_target(df, "_Success_qual")
 X = drop_columns_if_present(X, colinear_vars)
 
-X_train, X_test, y_train, y_test = train_test_split(
-    X, y, test_size=0.3, random_state=42, stratify=y
-)
+X_train, X_test, y_train, y_test = split_supervised_data(X, y)
 
 # === 4. Train Balanced & Pruned Decision Tree ===
 model = DecisionTreeClassifier(random_state=42, class_weight="balanced", max_depth=4)
@@ -170,7 +166,6 @@ and help the tree better generalize, especially for minority class predictions.
 
 # === 1. Imports and Setup ===
 import matplotlib.pyplot as plt
-from sklearn.model_selection import train_test_split
 from sklearn.tree import DecisionTreeClassifier, plot_tree
 
 # === 2. Load Preprocessed Supervised Dataset ===
@@ -181,9 +176,7 @@ colinear_vars = ["_δND", "_share_RSE_internal"]
 X, y = split_features_and_target(df, "_Success_qual")
 X = drop_columns_if_present(X, colinear_vars)
 
-X_train, X_test, y_train, y_test = train_test_split(
-    X, y, test_size=0.3, random_state=42, stratify=y
-)
+X_train, X_test, y_train, y_test = split_supervised_data(X, y)
 
 # === 4. Train Balanced, Pruned & Tuned Decision Tree ===
 model = DecisionTreeClassifier(
@@ -240,7 +233,6 @@ to improve performance on imbalanced classification.
 # === 1. Imports and Setup ===
 import matplotlib.pyplot as plt
 from imblearn.over_sampling import SMOTE
-from sklearn.model_selection import train_test_split
 from sklearn.tree import DecisionTreeClassifier, plot_tree
 
 # === 2. Load Preprocessed Supervised Dataset ===
@@ -252,9 +244,7 @@ colinear_vars = ["_δND", "_share_RSE_internal"]
 X, y = split_features_and_target(df, "_Success_qual")
 X = drop_columns_if_present(X, colinear_vars)
 
-X_train, X_test, y_train, y_test = train_test_split(
-    X, y, test_size=0.3, random_state=42, stratify=y
-)
+X_train, X_test, y_train, y_test = split_supervised_data(X, y)
 
 # === 4. Apply SMOTE to Training Data ===
 smote = SMOTE(random_state=42)
