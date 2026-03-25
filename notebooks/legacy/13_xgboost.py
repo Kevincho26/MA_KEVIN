@@ -33,6 +33,7 @@ from xgboost import XGBClassifier
 
 from src.data.loaders import load_supervised_modeling_dataset
 from src.features.preprocessing import drop_columns_if_present, split_features_and_target
+from src.models.evaluation import evaluate_binary_classifier
 
 # === 2. Load Preprocessed Supervised Dataset ===
 df = load_supervised_modeling_dataset()
@@ -54,27 +55,13 @@ model.fit(X_train, y_train)
 y_pred = model.predict(X_test)
 y_prob = model.predict_proba(X_test)[:, 1]
 
-print("\nClassification Report:")
-print(classification_report(y_test, y_pred))
-
-# Confusion Matrix
-cm = confusion_matrix(y_test, y_pred)
-disp = ConfusionMatrixDisplay(confusion_matrix=cm, display_labels=["unsuccessful", "successful"])
-disp.plot(cmap="Blues")
-plt.title("Confusion Matrix (XGBoost Basic)")
-plt.show()
-
-# ROC Curve
-fpr, tpr, thresholds = roc_curve(y_test, y_prob)
-auc_score = roc_auc_score(y_test, y_prob)
-plt.plot(fpr, tpr, label=f"AUC = {auc_score:.2f}")
-plt.plot([0, 1], [0, 1], linestyle="--", color="gray")
-plt.xlabel("False Positive Rate")
-plt.ylabel("True Positive Rate")
-plt.title("ROC Curve (XGBoost Basic)")
-plt.legend()
-plt.grid(True)
-plt.show()
+auc_score = evaluate_binary_classifier(
+    y_test,
+    y_pred,
+    y_prob,
+    confusion_matrix_title="Confusion Matrix (XGBoost Basic)",
+    roc_title="ROC Curve (XGBoost Basic)",
+)
 
 # === 6. Feature Importance ===
 importance_df = pd.DataFrame(
@@ -108,13 +95,6 @@ from collections import Counter
 import matplotlib.pyplot as plt
 import pandas as pd
 import seaborn as sns
-from sklearn.metrics import (
-    ConfusionMatrixDisplay,
-    classification_report,
-    confusion_matrix,
-    roc_auc_score,
-    roc_curve,
-)
 from sklearn.model_selection import train_test_split
 from xgboost import XGBClassifier
 
@@ -147,27 +127,13 @@ model.fit(X_train, y_train)
 y_pred = model.predict(X_test)
 y_prob = model.predict_proba(X_test)[:, 1]
 
-print("\nClassification Report:")
-print(classification_report(y_test, y_pred))
-
-# Confusion Matrix
-cm = confusion_matrix(y_test, y_pred)
-disp = ConfusionMatrixDisplay(confusion_matrix=cm, display_labels=["unsuccessful", "successful"])
-disp.plot(cmap="Blues")
-plt.title("Confusion Matrix (XGBoost Balanced)")
-plt.show()
-
-# ROC Curve
-fpr, tpr, thresholds = roc_curve(y_test, y_prob)
-auc_score = roc_auc_score(y_test, y_prob)
-plt.plot(fpr, tpr, label=f"AUC = {auc_score:.2f}")
-plt.plot([0, 1], [0, 1], linestyle="--", color="gray")
-plt.xlabel("False Positive Rate")
-plt.ylabel("True Positive Rate")
-plt.title("ROC Curve (XGBoost Balanced)")
-plt.legend()
-plt.grid(True)
-plt.show()
+auc_score = evaluate_binary_classifier(
+    y_test,
+    y_pred,
+    y_prob,
+    confusion_matrix_title="Confusion Matrix (XGBoost Balanced)",
+    roc_title="ROC Curve (XGBoost Balanced)",
+)
 
 # === 7. Feature Importance ===
 importance_df = pd.DataFrame(
@@ -195,13 +161,6 @@ print(importance_df.head())
 import matplotlib.pyplot as plt
 import pandas as pd
 import seaborn as sns
-from sklearn.metrics import (
-    ConfusionMatrixDisplay,
-    classification_report,
-    confusion_matrix,
-    roc_auc_score,
-    roc_curve,
-)
 from sklearn.model_selection import train_test_split
 from xgboost import XGBClassifier
 
@@ -229,27 +188,13 @@ threshold = 0.6  # Manually selected threshold
 y_prob = model.predict_proba(X_test)[:, 1]
 y_pred = (y_prob >= threshold).astype(int)
 
-print("\nClassification Report:")
-print(classification_report(y_test, y_pred))
-
-# Confusion Matrix
-cm = confusion_matrix(y_test, y_pred)
-disp = ConfusionMatrixDisplay(confusion_matrix=cm, display_labels=["unsuccessful", "successful"])
-disp.plot(cmap="Blues")
-plt.title("Confusion Matrix (XGBoost Balanced + Threshold)")
-plt.show()
-
-# ROC Curve
-fpr, tpr, thresholds = roc_curve(y_test, y_prob)
-auc_score = roc_auc_score(y_test, y_prob)
-plt.plot(fpr, tpr, label=f"AUC = {auc_score:.2f}")
-plt.plot([0, 1], [0, 1], linestyle="--", color="gray")
-plt.xlabel("False Positive Rate")
-plt.ylabel("True Positive Rate")
-plt.title("ROC Curve (XGBoost Balanced + Threshold)")
-plt.legend()
-plt.grid(True)
-plt.show()
+auc_score = evaluate_binary_classifier(
+    y_test,
+    y_pred,
+    y_prob,
+    confusion_matrix_title="Confusion Matrix (XGBoost Balanced + Threshold)",
+    roc_title="ROC Curve (XGBoost Balanced + Threshold)",
+)
 
 # === 6. Feature Importance ===
 importance_df = pd.DataFrame(
@@ -282,13 +227,6 @@ import numpy as np
 import pandas as pd
 import seaborn as sns
 from imblearn.over_sampling import SMOTE
-from sklearn.metrics import (
-    ConfusionMatrixDisplay,
-    classification_report,
-    confusion_matrix,
-    roc_auc_score,
-    roc_curve,
-)
 from sklearn.model_selection import train_test_split
 from xgboost import XGBClassifier
 
@@ -316,27 +254,13 @@ model.fit(X_train_res, y_train_res)
 y_prob = model.predict_proba(X_test)[:, 1]
 y_pred = (y_prob >= 0.5).astype(int)
 
-print("\nClassification Report:")
-print(classification_report(y_test, y_pred))
-
-# Confusion Matrix
-cm = confusion_matrix(y_test, y_pred)
-disp = ConfusionMatrixDisplay(confusion_matrix=cm, display_labels=["unsuccessful", "successful"])
-disp.plot(cmap="Blues")
-plt.title("Confusion Matrix (XGBoost SMOTE)")
-plt.show()
-
-# ROC Curve
-fpr, tpr, thresholds = roc_curve(y_test, y_prob)
-auc_score = roc_auc_score(y_test, y_prob)
-plt.plot(fpr, tpr, label=f"AUC = {auc_score:.2f}")
-plt.plot([0, 1], [0, 1], linestyle="--", color="gray")
-plt.xlabel("False Positive Rate")
-plt.ylabel("True Positive Rate")
-plt.title("ROC Curve (XGBoost SMOTE)")
-plt.legend()
-plt.grid(True)
-plt.show()
+auc_score = evaluate_binary_classifier(
+    y_test,
+    y_pred,
+    y_prob,
+    confusion_matrix_title="Confusion Matrix (XGBoost SMOTE)",
+    roc_title="ROC Curve (XGBoost SMOTE)",
+)
 
 # === 7. Feature Importance ===
 importance_df = pd.DataFrame(
@@ -371,13 +295,6 @@ import numpy as np
 import pandas as pd
 import seaborn as sns
 from imblearn.over_sampling import SMOTE
-from sklearn.metrics import (
-    ConfusionMatrixDisplay,
-    classification_report,
-    confusion_matrix,
-    roc_auc_score,
-    roc_curve,
-)
 from sklearn.model_selection import train_test_split
 from xgboost import XGBClassifier
 
@@ -410,27 +327,13 @@ y_prob = model.predict_proba(X_test)[:, 1]
 thresh = 0.6  # Adjust threshold
 y_pred = (y_prob >= thresh).astype(int)
 
-print("\nClassification Report:")
-print(classification_report(y_test, y_pred))
-
-# Confusion Matrix
-cm = confusion_matrix(y_test, y_pred)
-disp = ConfusionMatrixDisplay(confusion_matrix=cm, display_labels=["unsuccessful", "successful"])
-disp.plot(cmap="Blues")
-plt.title("Confusion Matrix (XGBoost SMOTE + Class Weight + Threshold)")
-plt.show()
-
-# ROC Curve
-fpr, tpr, thresholds = roc_curve(y_test, y_prob)
-auc_score = roc_auc_score(y_test, y_prob)
-plt.plot(fpr, tpr, label=f"AUC = {auc_score:.2f}")
-plt.plot([0, 1], [0, 1], linestyle="--", color="gray")
-plt.xlabel("False Positive Rate")
-plt.ylabel("True Positive Rate")
-plt.title("ROC Curve (XGBoost SMOTE + Class Weight + Threshold)")
-plt.legend()
-plt.grid(True)
-plt.show()
+auc_score = evaluate_binary_classifier(
+    y_test,
+    y_pred,
+    y_prob,
+    confusion_matrix_title="Confusion Matrix (XGBoost SMOTE + Class Weight + Threshold)",
+    roc_title="ROC Curve (XGBoost SMOTE + Class Weight + Threshold)",
+)
 
 # === 7. Feature Importance ===
 importance_df = pd.DataFrame(
