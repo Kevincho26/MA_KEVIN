@@ -38,6 +38,7 @@ from sklearn.model_selection import train_test_split
 
 from src.data.loaders import load_supervised_modeling_dataset
 from src.features.preprocessing import drop_columns_if_present, split_features_and_target
+from src.models.evaluation import evaluate_binary_classifier
 
 # === 2. Load Preprocessed Supervised Dataset ===
 df = load_supervised_modeling_dataset()
@@ -59,27 +60,13 @@ model.fit(X_train, y_train)
 y_pred = model.predict(X_test)
 y_prob = model.predict_proba(X_test)[:, 1]
 
-print("\nClassification Report:")
-print(classification_report(y_test, y_pred))
-
-# Confusion Matrix
-cm = confusion_matrix(y_test, y_pred)
-disp = ConfusionMatrixDisplay(confusion_matrix=cm, display_labels=["unsuccessful", "successful"])
-disp.plot(cmap="Blues")
-plt.title("Confusion Matrix (Random Forest Basic)")
-plt.show()
-
-# ROC Curve
-fpr, tpr, thresholds = roc_curve(y_test, y_prob)
-auc_score = roc_auc_score(y_test, y_prob)
-plt.plot(fpr, tpr, label=f"AUC = {auc_score:.2f}")
-plt.plot([0, 1], [0, 1], linestyle="--", color="gray")
-plt.xlabel("False Positive Rate")
-plt.ylabel("True Positive Rate")
-plt.title("ROC Curve (Random Forest Basic)")
-plt.legend()
-plt.grid(True)
-plt.show()
+auc_score = evaluate_binary_classifier(
+    y_test,
+    y_pred,
+    y_prob,
+    confusion_matrix_title="Confusion Matrix (Random Forest Basic)",
+    roc_title="ROC Curve (Random Forest Basic)",
+)
 
 # === 6. Feature Importance ===
 importance_df = pd.DataFrame(
@@ -109,13 +96,6 @@ import matplotlib.pyplot as plt
 import pandas as pd
 import seaborn as sns
 from sklearn.ensemble import RandomForestClassifier
-from sklearn.metrics import (
-    ConfusionMatrixDisplay,
-    classification_report,
-    confusion_matrix,
-    roc_auc_score,
-    roc_curve,
-)
 from sklearn.model_selection import train_test_split
 
 # === 2. Load Preprocessed Supervised Dataset ===
@@ -138,27 +118,13 @@ model.fit(X_train, y_train)
 y_pred = model.predict(X_test)
 y_prob = model.predict_proba(X_test)[:, 1]
 
-print("\nClassification Report:")
-print(classification_report(y_test, y_pred))
-
-# Confusion Matrix
-cm = confusion_matrix(y_test, y_pred)
-disp = ConfusionMatrixDisplay(confusion_matrix=cm, display_labels=["unsuccessful", "successful"])
-disp.plot(cmap="Blues")
-plt.title("Confusion Matrix (Random Forest v2 - Balanced)")
-plt.show()
-
-# ROC Curve
-fpr, tpr, thresholds = roc_curve(y_test, y_prob)
-auc_score = roc_auc_score(y_test, y_prob)
-plt.plot(fpr, tpr, label=f"AUC = {auc_score:.2f}")
-plt.plot([0, 1], [0, 1], linestyle="--", color="gray")
-plt.xlabel("False Positive Rate")
-plt.ylabel("True Positive Rate")
-plt.title("ROC Curve (Random Forest v2 - Balanced)")
-plt.legend()
-plt.grid(True)
-plt.show()
+auc_score = evaluate_binary_classifier(
+    y_test,
+    y_pred,
+    y_prob,
+    confusion_matrix_title="Confusion Matrix (Random Forest v2 - Balanced)",
+    roc_title="ROC Curve (Random Forest v2 - Balanced)",
+)
 
 # === 6. Feature Importance ===
 importance_df = pd.DataFrame(
@@ -189,13 +155,6 @@ import pandas as pd
 import seaborn as sns
 from imblearn.over_sampling import SMOTE
 from sklearn.ensemble import RandomForestClassifier
-from sklearn.metrics import (
-    ConfusionMatrixDisplay,
-    classification_report,
-    confusion_matrix,
-    roc_auc_score,
-    roc_curve,
-)
 from sklearn.model_selection import train_test_split
 
 # === 2. Load Preprocessed Supervised Dataset ===
@@ -222,27 +181,13 @@ model.fit(X_train_resampled, y_train_resampled)
 y_pred = model.predict(X_test)
 y_prob = model.predict_proba(X_test)[:, 1]
 
-print("\nClassification Report:")
-print(classification_report(y_test, y_pred))
-
-# Confusion Matrix
-cm = confusion_matrix(y_test, y_pred)
-disp = ConfusionMatrixDisplay(confusion_matrix=cm, display_labels=["unsuccessful", "successful"])
-disp.plot(cmap="Blues")
-plt.title("Confusion Matrix (Random Forest SMOTE)")
-plt.show()
-
-# ROC Curve
-fpr, tpr, thresholds = roc_curve(y_test, y_prob)
-auc_score = roc_auc_score(y_test, y_prob)
-plt.plot(fpr, tpr, label=f"AUC = {auc_score:.2f}")
-plt.plot([0, 1], [0, 1], linestyle="--", color="gray")
-plt.xlabel("False Positive Rate")
-plt.ylabel("True Positive Rate")
-plt.title("ROC Curve (Random Forest SMOTE)")
-plt.legend()
-plt.grid(True)
-plt.show()
+auc_score = evaluate_binary_classifier(
+    y_test,
+    y_pred,
+    y_prob,
+    confusion_matrix_title="Confusion Matrix (Random Forest SMOTE)",
+    roc_title="ROC Curve (Random Forest SMOTE)",
+)
 
 # === 7. Feature Importance ===
 importance_df = pd.DataFrame(
@@ -277,13 +222,6 @@ import pandas as pd
 import seaborn as sns
 from imblearn.over_sampling import SMOTE
 from sklearn.ensemble import RandomForestClassifier
-from sklearn.metrics import (
-    ConfusionMatrixDisplay,
-    classification_report,
-    confusion_matrix,
-    roc_auc_score,
-    roc_curve,
-)
 from sklearn.model_selection import train_test_split
 
 # === 2. Load Preprocessed Supervised Dataset ===
@@ -312,27 +250,13 @@ threshold = 0.6  # lowered to increase sensitivity to class 0
 y_pred = (y_prob >= threshold).astype(int)
 
 # === 7. Evaluate Performance ===
-print("\nClassification Report:")
-print(classification_report(y_test, y_pred))
-
-# Confusion Matrix
-cm = confusion_matrix(y_test, y_pred)
-disp = ConfusionMatrixDisplay(confusion_matrix=cm, display_labels=["unsuccessful", "successful"])
-disp.plot(cmap="Blues")
-plt.title("Confusion Matrix (Random Forest SMOTE + Class Weight + Threshold)")
-plt.show()
-
-# ROC Curve
-fpr, tpr, thresholds = roc_curve(y_test, y_prob)
-auc_score = roc_auc_score(y_test, y_prob)
-plt.plot(fpr, tpr, label=f"AUC = {auc_score:.2f}")
-plt.plot([0, 1], [0, 1], linestyle="--", color="gray")
-plt.xlabel("False Positive Rate")
-plt.ylabel("True Positive Rate")
-plt.title("ROC Curve (Random Forest SMOTE + Class Weight + Threshold)")
-plt.legend()
-plt.grid(True)
-plt.show()
+auc_score = evaluate_binary_classifier(
+    y_test,
+    y_pred,
+    y_prob,
+    confusion_matrix_title="Confusion Matrix (Random Forest SMOTE + Class Weight + Threshold)",
+    roc_title="ROC Curve (Random Forest SMOTE + Class Weight + Threshold)",
+)
 
 # === 8. Feature Importance ===
 importance_df = pd.DataFrame(
