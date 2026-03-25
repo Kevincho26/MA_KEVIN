@@ -30,6 +30,7 @@ from sklearn.linear_model import LogisticRegression
 from src.data.loaders import load_supervised_modeling_dataset
 from src.features.preprocessing import drop_columns_if_present, split_features_and_target
 from src.models.evaluation import evaluate_binary_classifier
+from src.models.interpretation import plot_coefficients, prepare_coefficient_df
 from src.models.splitting import scale_train_test, split_supervised_data
 
 # === 2. Load Supervised Modeling Dataset ===
@@ -63,24 +64,12 @@ auc_score = evaluate_binary_classifier(
 )
 
 # === 7. Analyze Coefficients ===
-coef_df = pd.DataFrame({"Feature": X.columns, "Coefficient": model.coef_[0]}).sort_values(
-    by="Coefficient", ascending=False
+coef_df = prepare_coefficient_df(X.columns, model.coef_[0])
+
+plot_coefficients(
+    coef_df,
+    title="AQUI VA TU TITULO ACTUAL",
 )
-
-plt.figure(figsize=(10, 6))
-ax = sns.barplot(x="Coefficient", y="Feature", data=coef_df, palette="coolwarm")
-plt.axvline(0, color="gray", linestyle="--")
-plt.title("Logistic Regression Coefficients")
-
-# Annotate values on bars
-for i in ax.containers:
-    ax.bar_label(i, fmt="%.2f", label_type="edge", fontsize=9, padding=3)
-
-plt.tight_layout()
-plt.show()
-
-print("\nTop influencing features:")
-print(coef_df.head())
 
 # %% [markdown]
 # ## 2. Logistic Regression: L1 (Lazo) Penalization
@@ -105,24 +94,12 @@ auc_score = evaluate_binary_classifier(
 )
 
 # === 7. Analyze Coefficients ===
-coef_df = pd.DataFrame({"Feature": X.columns, "Coefficient": model.coef_[0]}).sort_values(
-    by="Coefficient", ascending=False
+coef_df = prepare_coefficient_df(X.columns, model.coef_[0])
+
+plot_coefficients(
+    coef_df,
+    title="AQUI VA TU TITULO ACTUAL",
 )
-
-plt.figure(figsize=(10, 6))
-ax = sns.barplot(x="Coefficient", y="Feature", data=coef_df, palette="coolwarm")
-plt.axvline(0, color="gray", linestyle="--")
-plt.title("L1-Regularized Coefficients")
-
-# Annotate values on bars
-for i in ax.containers:
-    ax.bar_label(i, fmt="%.2f", label_type="edge", fontsize=9, padding=3)
-
-plt.tight_layout()
-plt.show()
-
-print("\nTop influencing features:")
-print(coef_df.head())
 
 # %% [markdown]
 # ## 3. Logistic Regression: Weight class penalization
@@ -146,24 +123,12 @@ auc_score = evaluate_binary_classifier(
 )
 
 # === 7. Analyze Coefficients ===
-coef_df = pd.DataFrame({"Feature": X.columns, "Coefficient": model.coef_[0]}).sort_values(
-    by="Coefficient", ascending=False
+coef_df = prepare_coefficient_df(X.columns, model.coef_[0])
+
+plot_coefficients(
+    coef_df,
+    title="AQUI VA TU TITULO ACTUAL",
 )
-
-plt.figure(figsize=(10, 6))
-ax = sns.barplot(x="Coefficient", y="Feature", data=coef_df, palette="coolwarm")
-plt.axvline(0, color="gray", linestyle="--")
-plt.title("Logistic Regression Coefficients (Custom Weights: 0=5, 1=1)")
-
-# Annotate values on bars
-for i in ax.containers:
-    ax.bar_label(i, fmt="%.2f", label_type="edge", fontsize=9, padding=3)
-
-plt.tight_layout()
-plt.show()
-
-print("\nTop influencing features:")
-print(coef_df.head())
 
 # %% [markdown]
 # ## 4. Logistic Regression: SMOTE
@@ -192,21 +157,9 @@ auc_score = evaluate_binary_classifier(
 )
 
 # === 8. Analyze Coefficients ===
-coef_df = pd.DataFrame({"Feature": X.columns, "Coefficient": model.coef_[0]}).sort_values(
-    by="Coefficient", ascending=False
+coef_df = prepare_coefficient_df(X.columns, model.coef_[0])
+
+plot_coefficients(
+    coef_df,
+    title="AQUI VA TU TITULO ACTUAL",
 )
-
-plt.figure(figsize=(10, 6))
-ax = sns.barplot(x="Coefficient", y="Feature", data=coef_df, palette="coolwarm")
-plt.axvline(0, color="gray", linestyle="--")
-plt.title("Logistic Regression Coefficients (SMOTE)")
-
-# Annotate values on bars
-for i in ax.containers:
-    ax.bar_label(i, fmt="%.2f", label_type="edge", fontsize=9, padding=3)
-
-plt.tight_layout()
-plt.show()
-
-print("\nTop influencing features:")
-print(coef_df.head())
