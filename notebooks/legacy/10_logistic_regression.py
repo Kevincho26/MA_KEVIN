@@ -26,18 +26,12 @@ import matplotlib.pyplot as plt
 import pandas as pd
 import seaborn as sns
 from sklearn.linear_model import LogisticRegression
-from sklearn.metrics import (
-    ConfusionMatrixDisplay,
-    classification_report,
-    confusion_matrix,
-    roc_auc_score,
-    roc_curve,
-)
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import StandardScaler
 
 from src.data.loaders import load_supervised_modeling_dataset
 from src.features.preprocessing import drop_columns_if_present, split_features_and_target
+from src.models.evaluation import evaluate_binary_classifier
 
 # === 2. Load Supervised Modeling Dataset ===
 df = load_supervised_modeling_dataset()
@@ -65,27 +59,13 @@ model.fit(X_train_scaled, y_train)
 y_pred = model.predict(X_test_scaled)
 y_prob = model.predict_proba(X_test_scaled)[:, 1]
 
-print("\nClassification Report:")
-print(classification_report(y_test, y_pred))
-
-# Confusion Matrix
-cm = confusion_matrix(y_test, y_pred)
-disp = ConfusionMatrixDisplay(confusion_matrix=cm, display_labels=["unsuccessful", "successful"])
-disp.plot(cmap="Blues")
-plt.title("Confusion Matrix")
-plt.show()
-
-# ROC Curve and AUC
-fpr, tpr, thresholds = roc_curve(y_test, y_prob)
-auc_score = roc_auc_score(y_test, y_prob)
-plt.plot(fpr, tpr, label=f"AUC = {auc_score:.2f}")
-plt.plot([0, 1], [0, 1], linestyle="--", color="gray")
-plt.xlabel("False Positive Rate")
-plt.ylabel("True Positive Rate")
-plt.title("ROC Curve")
-plt.legend()
-plt.grid(True)
-plt.show()
+auc_score = evaluate_binary_classifier(
+    y_test,
+    y_pred,
+    y_prob,
+    confusion_matrix_title="Confusion Matrix",
+    roc_title="ROC Curve",
+)
 
 # === 7. Analyze Coefficients ===
 coef_df = pd.DataFrame({"Feature": X.columns, "Coefficient": model.coef_[0]}).sort_values(
@@ -121,27 +101,13 @@ model.fit(X_train_scaled, y_train)
 y_pred = model.predict(X_test_scaled)
 y_prob = model.predict_proba(X_test_scaled)[:, 1]
 
-print("\nClassification Report:")
-print(classification_report(y_test, y_pred))
-
-# Confusion Matrix
-cm = confusion_matrix(y_test, y_pred)
-disp = ConfusionMatrixDisplay(confusion_matrix=cm, display_labels=["unsuccessful", "successful"])
-disp.plot(cmap="Blues")
-plt.title("Confusion Matrix (L1)")
-plt.show()
-
-# ROC Curve and AUC
-fpr, tpr, thresholds = roc_curve(y_test, y_prob)
-auc_score = roc_auc_score(y_test, y_prob)
-plt.plot(fpr, tpr, label=f"AUC = {auc_score:.2f}")
-plt.plot([0, 1], [0, 1], linestyle="--", color="gray")
-plt.xlabel("False Positive Rate")
-plt.ylabel("True Positive Rate")
-plt.title("ROC Curve (L1)")
-plt.legend()
-plt.grid(True)
-plt.show()
+auc_score = evaluate_binary_classifier(
+    y_test,
+    y_pred,
+    y_prob,
+    confusion_matrix_title="Confusion Matrix (L1)",
+    roc_title="ROC Curve (L1)",
+)
 
 # === 7. Analyze Coefficients ===
 coef_df = pd.DataFrame({"Feature": X.columns, "Coefficient": model.coef_[0]}).sort_values(
@@ -176,27 +142,13 @@ model.fit(X_train_scaled, y_train)
 y_pred = model.predict(X_test_scaled)
 y_prob = model.predict_proba(X_test_scaled)[:, 1]
 
-print("\nClassification Report:")
-print(classification_report(y_test, y_pred))
-
-# Confusion Matrix
-cm = confusion_matrix(y_test, y_pred)
-disp = ConfusionMatrixDisplay(confusion_matrix=cm, display_labels=["unsuccessful", "successful"])
-disp.plot(cmap="Blues")
-plt.title("Confusion Matrix (Custom Weights: 0=5, 1=1)")
-plt.show()
-
-# ROC Curve and AUC
-fpr, tpr, thresholds = roc_curve(y_test, y_prob)
-auc_score = roc_auc_score(y_test, y_prob)
-plt.plot(fpr, tpr, label=f"AUC = {auc_score:.2f}")
-plt.plot([0, 1], [0, 1], linestyle="--", color="gray")
-plt.xlabel("False Positive Rate")
-plt.ylabel("True Positive Rate")
-plt.title("ROC Curve (Custom Weights: 0=5, 1=1)")
-plt.legend()
-plt.grid(True)
-plt.show()
+auc_score = evaluate_binary_classifier(
+    y_test,
+    y_pred,
+    y_prob,
+    confusion_matrix_title="Confusion Matrix (Custom Weights: 0=5, 1=1)",
+    roc_title="ROC Curve (Custom Weights: 0=5, 1=1)",
+)
 
 # === 7. Analyze Coefficients ===
 coef_df = pd.DataFrame({"Feature": X.columns, "Coefficient": model.coef_[0]}).sort_values(
@@ -236,27 +188,13 @@ model.fit(X_train_resampled, y_train_resampled)
 y_pred = model.predict(X_test_scaled)
 y_prob = model.predict_proba(X_test_scaled)[:, 1]
 
-print("\nClassification Report:")
-print(classification_report(y_test, y_pred))
-
-# Confusion Matrix
-cm = confusion_matrix(y_test, y_pred)
-disp = ConfusionMatrixDisplay(confusion_matrix=cm, display_labels=["unsuccessful", "successful"])
-disp.plot(cmap="Blues")
-plt.title("Confusion Matrix (SMOTE)")
-plt.show()
-
-# ROC Curve and AUC
-fpr, tpr, thresholds = roc_curve(y_test, y_prob)
-auc_score = roc_auc_score(y_test, y_prob)
-plt.plot(fpr, tpr, label=f"AUC = {auc_score:.2f}")
-plt.plot([0, 1], [0, 1], linestyle="--", color="gray")
-plt.xlabel("False Positive Rate")
-plt.ylabel("True Positive Rate")
-plt.title("ROC Curve (SMOTE)")
-plt.legend()
-plt.grid(True)
-plt.show()
+auc_score = evaluate_binary_classifier(
+    y_test,
+    y_pred,
+    y_prob,
+    confusion_matrix_title="Confusion Matrix (SMOTE)",
+    roc_title="ROC Curve (SMOTE)",
+)
 
 # === 8. Analyze Coefficients ===
 coef_df = pd.DataFrame({"Feature": X.columns, "Coefficient": model.coef_[0]}).sort_values(
