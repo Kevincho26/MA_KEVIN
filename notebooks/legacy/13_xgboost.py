@@ -34,6 +34,10 @@ from xgboost import XGBClassifier
 from src.data.loaders import load_supervised_modeling_dataset
 from src.features.preprocessing import drop_columns_if_present, split_features_and_target
 from src.models.evaluation import evaluate_binary_classifier
+from src.models.interpretation import (
+    plot_feature_importance,
+    prepare_feature_importance_df,
+)
 
 # === 2. Load Preprocessed Supervised Dataset ===
 df = load_supervised_modeling_dataset()
@@ -64,23 +68,12 @@ auc_score = evaluate_binary_classifier(
 )
 
 # === 6. Feature Importance ===
-importance_df = pd.DataFrame(
-    {"Feature": X.columns, "Importance": model.feature_importances_}
-).sort_values(by="Importance", ascending=False)
+importance_df = prepare_feature_importance_df(X.columns, model.feature_importances_)
 
-plt.figure(figsize=(10, 6))
-ax = sns.barplot(x="Importance", y="Feature", data=importance_df, palette="coolwarm")
-plt.title("Feature Importance (XGBoost Basic)")
-
-# Annotate values on bars
-for container in ax.containers:
-    ax.bar_label(container, fmt="%.2f", label_type="edge", fontsize=9, padding=3)
-
-plt.tight_layout()
-plt.show()
-
-print("\nTop influencing features:")
-print(importance_df.head())
+plot_feature_importance(
+    importance_df,
+    title="Feature Importance (XGBoost Basic)",
+)
 
 # %% [markdown]
 # ## 2. XGBoost: Balanced
@@ -92,9 +85,6 @@ print(importance_df.head())
 # === 1. Imports and Setup ===
 from collections import Counter
 
-import matplotlib.pyplot as plt
-import pandas as pd
-import seaborn as sns
 from sklearn.model_selection import train_test_split
 from xgboost import XGBClassifier
 
@@ -136,31 +126,17 @@ auc_score = evaluate_binary_classifier(
 )
 
 # === 7. Feature Importance ===
-importance_df = pd.DataFrame(
-    {"Feature": X.columns, "Importance": model.feature_importances_}
-).sort_values(by="Importance", ascending=False)
+importance_df = prepare_feature_importance_df(X.columns, model.feature_importances_)
 
-plt.figure(figsize=(10, 6))
-ax = sns.barplot(x="Importance", y="Feature", data=importance_df, palette="coolwarm")
-plt.title("Feature Importance (XGBoost Balanced)")
-
-# Annotate values on bars
-for container in ax.containers:
-    ax.bar_label(container, fmt="%.2f", label_type="edge", fontsize=9, padding=3)
-
-plt.tight_layout()
-plt.show()
-
-print("\nTop influencing features:")
-print(importance_df.head())
+plot_feature_importance(
+    importance_df,
+    title="Feature Importance (XGBoost Balanced)",
+)
 
 # %%
 # This version uses class_weight approximation and adjusts the decision threshold to improve detection of the minority class.
 
 # === 1. Imports and Setup ===
-import matplotlib.pyplot as plt
-import pandas as pd
-import seaborn as sns
 from sklearn.model_selection import train_test_split
 from xgboost import XGBClassifier
 
@@ -197,23 +173,12 @@ auc_score = evaluate_binary_classifier(
 )
 
 # === 6. Feature Importance ===
-importance_df = pd.DataFrame(
-    {"Feature": X.columns, "Importance": model.feature_importances_}
-).sort_values(by="Importance", ascending=False)
+importance_df = prepare_feature_importance_df(X.columns, model.feature_importances_)
 
-plt.figure(figsize=(10, 6))
-ax = sns.barplot(x="Importance", y="Feature", data=importance_df, palette="coolwarm")
-plt.title("Feature Importance (XGBoost Balanced + Threshold)")
-
-# Annotate values on bars
-for container in ax.containers:
-    ax.bar_label(container, fmt="%.2f", label_type="edge", fontsize=9, padding=3)
-
-plt.tight_layout()
-plt.show()
-
-print("\nTop influencing features:")
-print(importance_df.head())
+plot_feature_importance(
+    importance_df,
+    title="Feature Importance (XGBoost Balanced + Threshold)",
+)
 
 # %% [markdown]
 # ## 3. XGBoost: SMOTE
@@ -222,10 +187,7 @@ print(importance_df.head())
 # This version applies SMOTE to balance the training data and trains an XGBoost classifier without using class weights or threshold adjustment.
 
 # === 1. Imports and Setup ===
-import matplotlib.pyplot as plt
 import numpy as np
-import pandas as pd
-import seaborn as sns
 from imblearn.over_sampling import SMOTE
 from sklearn.model_selection import train_test_split
 from xgboost import XGBClassifier
@@ -263,23 +225,12 @@ auc_score = evaluate_binary_classifier(
 )
 
 # === 7. Feature Importance ===
-importance_df = pd.DataFrame(
-    {"Feature": X.columns, "Importance": model.feature_importances_}
-).sort_values(by="Importance", ascending=False)
+importance_df = prepare_feature_importance_df(X.columns, model.feature_importances_)
 
-plt.figure(figsize=(10, 6))
-ax = sns.barplot(x="Importance", y="Feature", data=importance_df, palette="coolwarm")
-plt.title("Feature Importance (XGBoost SMOTE)")
-
-# Annotate values on bars
-for container in ax.containers:
-    ax.bar_label(container, fmt="%.2f", label_type="edge", fontsize=9, padding=3)
-
-plt.tight_layout()
-plt.show()
-
-print("\nTop influencing features:")
-print(importance_df.head())
+plot_feature_importance(
+    importance_df,
+    title="Feature Importance (XGBoost SMOTE)",
+)
 
 # %% [markdown]
 # ## 4. XGBoost: SMOTE + Class Weight + Threshold
@@ -290,10 +241,7 @@ print(importance_df.head())
 # === 1. Imports and Setup ===
 from pathlib import Path
 
-import matplotlib.pyplot as plt
 import numpy as np
-import pandas as pd
-import seaborn as sns
 from imblearn.over_sampling import SMOTE
 from sklearn.model_selection import train_test_split
 from xgboost import XGBClassifier
@@ -336,20 +284,9 @@ auc_score = evaluate_binary_classifier(
 )
 
 # === 7. Feature Importance ===
-importance_df = pd.DataFrame(
-    {"Feature": X.columns, "Importance": model.feature_importances_}
-).sort_values(by="Importance", ascending=False)
+importance_df = prepare_feature_importance_df(X.columns, model.feature_importances_)
 
-plt.figure(figsize=(10, 6))
-ax = sns.barplot(x="Importance", y="Feature", data=importance_df, palette="coolwarm")
-plt.title("Feature Importance (XGBoost SMOTE + Class Weight + Threshold)")
-
-# Annotate values on bars
-for container in ax.containers:
-    ax.bar_label(container, fmt="%.2f", label_type="edge", fontsize=9, padding=3)
-
-plt.tight_layout()
-plt.show()
-
-print("\nTop influencing features:")
-print(importance_df.head())
+plot_feature_importance(
+    importance_df,
+    title="Feature Importance (XGBoost SMOTE + Class Weight + Threshold)",
+)
