@@ -28,7 +28,6 @@ from sklearn.metrics import (
     roc_auc_score,
     roc_curve,
 )
-from sklearn.model_selection import train_test_split
 from xgboost import XGBClassifier
 
 from src.data.loaders import load_supervised_modeling_dataset
@@ -38,6 +37,7 @@ from src.models.interpretation import (
     plot_feature_importance,
     prepare_feature_importance_df,
 )
+from src.models.splitting import split_supervised_data
 
 # === 2. Load Preprocessed Supervised Dataset ===
 df = load_supervised_modeling_dataset()
@@ -47,9 +47,7 @@ colinear_vars = ["_δND", "_share_RSE_internal"]
 X, y = split_features_and_target(df, "_Success_qual")
 X = drop_columns_if_present(X, colinear_vars)
 
-X_train, X_test, y_train, y_test = train_test_split(
-    X, y, test_size=0.3, random_state=42, stratify=y
-)
+X_train, X_test, y_train, y_test = split_supervised_data(X, y)
 
 # === 4. Train XGBoost Classifier ===
 model = XGBClassifier(use_label_encoder=False, eval_metric="logloss", random_state=42)
@@ -96,9 +94,7 @@ colinear_vars = ["_δND", "_share_RSE_internal"]
 X, y = split_features_and_target(df, "_Success_qual")
 X = drop_columns_if_present(X, colinear_vars)
 
-X_train, X_test, y_train, y_test = train_test_split(
-    X, y, test_size=0.3, random_state=42, stratify=y
-)
+X_train, X_test, y_train, y_test = split_supervised_data(X, y)
 
 # === 4. Compute Class Weight for Balance ===
 class_counts = Counter(y_train)
@@ -137,7 +133,6 @@ plot_feature_importance(
 # This version uses class_weight approximation and adjusts the decision threshold to improve detection of the minority class.
 
 # === 1. Imports and Setup ===
-from sklearn.model_selection import train_test_split
 from xgboost import XGBClassifier
 
 # === 2. Load Preprocessed Supervised Dataset ===
@@ -148,9 +143,7 @@ colinear_vars = ["_δND", "_share_RSE_internal"]
 X, y = split_features_and_target(df, "_Success_qual")
 X = drop_columns_if_present(X, colinear_vars)
 
-X_train, X_test, y_train, y_test = train_test_split(
-    X, y, test_size=0.3, random_state=42, stratify=y
-)
+X_train, X_test, y_train, y_test = split_supervised_data(X, y)
 
 # === 4. Train XGBoost Classifier with Class Weight Adjustment ===
 ratio = float(np.sum(y_train == 0)) / np.sum(y_train == 1)
@@ -189,7 +182,6 @@ plot_feature_importance(
 # === 1. Imports and Setup ===
 import numpy as np
 from imblearn.over_sampling import SMOTE
-from sklearn.model_selection import train_test_split
 from xgboost import XGBClassifier
 
 # === 2. Load Preprocessed Supervised Dataset ===
@@ -200,9 +192,7 @@ colinear_vars = ["_δND", "_share_RSE_internal"]
 X, y = split_features_and_target(df, "_Success_qual")
 X = drop_columns_if_present(X, colinear_vars)
 
-X_train, X_test, y_train, y_test = train_test_split(
-    X, y, test_size=0.3, random_state=42, stratify=y
-)
+X_train, X_test, y_train, y_test = split_supervised_data(X, y)
 
 # === 4. Apply SMOTE to Training Data ===
 sm = SMOTE(random_state=42)
@@ -243,7 +233,6 @@ from pathlib import Path
 
 import numpy as np
 from imblearn.over_sampling import SMOTE
-from sklearn.model_selection import train_test_split
 from xgboost import XGBClassifier
 
 # === 2. Load Preprocessed Supervised Dataset ===
@@ -254,9 +243,7 @@ colinear_vars = ["_δND", "_share_RSE_internal"]
 X, y = split_features_and_target(df, "_Success_qual")
 X = drop_columns_if_present(X, colinear_vars)
 
-X_train, X_test, y_train, y_test = train_test_split(
-    X, y, test_size=0.3, random_state=42, stratify=y
-)
+X_train, X_test, y_train, y_test = split_supervised_data(X, y)
 
 # === 4. Apply SMOTE to Training Data ===
 sm = SMOTE(random_state=42)
