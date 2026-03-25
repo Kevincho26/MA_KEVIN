@@ -36,6 +36,7 @@ from sklearn.tree import DecisionTreeClassifier, plot_tree
 
 from src.data.loaders import load_supervised_modeling_dataset
 from src.features.preprocessing import drop_columns_if_present, split_features_and_target
+from src.models.evaluation import evaluate_binary_classifier
 
 # === 2. Load Preprocessed Supervised Dataset ===
 df = load_supervised_modeling_dataset()
@@ -57,27 +58,13 @@ model.fit(X_train, y_train)
 y_pred = model.predict(X_test)
 y_prob = model.predict_proba(X_test)[:, 1]
 
-print("\nClassification Report:")
-print(classification_report(y_test, y_pred))
-
-# Confusion Matrix
-cm = confusion_matrix(y_test, y_pred)
-disp = ConfusionMatrixDisplay(confusion_matrix=cm, display_labels=["unsuccessful", "successful"])
-disp.plot(cmap="Blues")
-plt.title("Confusion Matrix (Decision Tree Basic)")
-plt.show()
-
-# ROC Curve
-fpr, tpr, thresholds = roc_curve(y_test, y_prob)
-auc_score = roc_auc_score(y_test, y_prob)
-plt.plot(fpr, tpr, label=f"AUC = {auc_score:.2f}")
-plt.plot([0, 1], [0, 1], linestyle="--", color="gray")
-plt.xlabel("False Positive Rate")
-plt.ylabel("True Positive Rate")
-plt.title("ROC Curve (Decision Tree Basic)")
-plt.legend()
-plt.grid(True)
-plt.show()
+auc_score = evaluate_binary_classifier(
+    y_test,
+    y_pred,
+    y_prob,
+    confusion_matrix_title="Confusion Matrix (Decision Tree Basic)",
+    roc_title="ROC Curve (Decision Tree Basic)",
+)
 
 # === 6. Feature Importance ===
 importance_df = pd.DataFrame(
@@ -129,13 +116,6 @@ This version applies class_weight='balanced' and limits max_depth to reduce over
 import matplotlib.pyplot as plt
 import pandas as pd
 import seaborn as sns
-from sklearn.metrics import (
-    ConfusionMatrixDisplay,
-    classification_report,
-    confusion_matrix,
-    roc_auc_score,
-    roc_curve,
-)
 from sklearn.model_selection import train_test_split
 from sklearn.tree import DecisionTreeClassifier, plot_tree
 
@@ -159,27 +139,13 @@ model.fit(X_train, y_train)
 y_pred = model.predict(X_test)
 y_prob = model.predict_proba(X_test)[:, 1]
 
-print("\nClassification Report:")
-print(classification_report(y_test, y_pred))
-
-# Confusion Matrix
-cm = confusion_matrix(y_test, y_pred)
-disp = ConfusionMatrixDisplay(confusion_matrix=cm, display_labels=["unsuccessful", "successful"])
-disp.plot(cmap="Blues")
-plt.title("Confusion Matrix (Decision Tree v2)")
-plt.show()
-
-# ROC Curve
-fpr, tpr, thresholds = roc_curve(y_test, y_prob)
-auc_score = roc_auc_score(y_test, y_prob)
-plt.plot(fpr, tpr, label=f"AUC = {auc_score:.2f}")
-plt.plot([0, 1], [0, 1], linestyle="--", color="gray")
-plt.xlabel("False Positive Rate")
-plt.ylabel("True Positive Rate")
-plt.title("ROC Curve (Decision Tree v2)")
-plt.legend()
-plt.grid(True)
-plt.show()
+auc_score = evaluate_binary_classifier(
+    y_test,
+    y_pred,
+    y_prob,
+    confusion_matrix_title="Confusion Matrix (Decision Tree v2)",
+    roc_title="ROC Curve (Decision Tree v2)",
+)
 
 # === 6. Feature Importance ===
 importance_df = pd.DataFrame(
@@ -226,13 +192,6 @@ and help the tree better generalize, especially for minority class predictions.
 import matplotlib.pyplot as plt
 import pandas as pd
 import seaborn as sns
-from sklearn.metrics import (
-    ConfusionMatrixDisplay,
-    classification_report,
-    confusion_matrix,
-    roc_auc_score,
-    roc_curve,
-)
 from sklearn.model_selection import train_test_split
 from sklearn.tree import DecisionTreeClassifier, plot_tree
 
@@ -258,27 +217,13 @@ model.fit(X_train, y_train)
 y_pred = model.predict(X_test)
 y_prob = model.predict_proba(X_test)[:, 1]
 
-print("\nClassification Report:")
-print(classification_report(y_test, y_pred))
-
-# Confusion Matrix
-cm = confusion_matrix(y_test, y_pred)
-disp = ConfusionMatrixDisplay(confusion_matrix=cm, display_labels=["unsuccessful", "successful"])
-disp.plot(cmap="Blues")
-plt.title("Confusion Matrix (Decision Tree v3)")
-plt.show()
-
-# ROC Curve
-fpr, tpr, thresholds = roc_curve(y_test, y_prob)
-auc_score = roc_auc_score(y_test, y_prob)
-plt.plot(fpr, tpr, label=f"AUC = {auc_score:.2f}")
-plt.plot([0, 1], [0, 1], linestyle="--", color="gray")
-plt.xlabel("False Positive Rate")
-plt.ylabel("True Positive Rate")
-plt.title("ROC Curve (Decision Tree v3)")
-plt.legend()
-plt.grid(True)
-plt.show()
+auc_score = evaluate_binary_classifier(
+    y_test,
+    y_pred,
+    y_prob,
+    confusion_matrix_title="Confusion Matrix (Decision Tree v3)",
+    roc_title="ROC Curve (Decision Tree v3)",
+)
 
 # === 6. Feature Importance ===
 importance_df = pd.DataFrame(
@@ -330,13 +275,6 @@ import matplotlib.pyplot as plt
 import pandas as pd
 import seaborn as sns
 from imblearn.over_sampling import SMOTE
-from sklearn.metrics import (
-    ConfusionMatrixDisplay,
-    classification_report,
-    confusion_matrix,
-    roc_auc_score,
-    roc_curve,
-)
 from sklearn.model_selection import train_test_split
 from sklearn.tree import DecisionTreeClassifier, plot_tree
 
@@ -365,27 +303,13 @@ model.fit(X_train_sm, y_train_sm)
 y_pred = model.predict(X_test)
 y_prob = model.predict_proba(X_test)[:, 1]
 
-print("\nClassification Report:")
-print(classification_report(y_test, y_pred))
-
-# Confusion Matrix
-cm = confusion_matrix(y_test, y_pred)
-disp = ConfusionMatrixDisplay(confusion_matrix=cm, display_labels=["unsuccessful", "successful"])
-disp.plot(cmap="Blues")
-plt.title("Confusion Matrix (Decision Tree SMOTE)")
-plt.show()
-
-# ROC Curve
-fpr, tpr, thresholds = roc_curve(y_test, y_prob)
-auc_score = roc_auc_score(y_test, y_prob)
-plt.plot(fpr, tpr, label=f"AUC = {auc_score:.2f}")
-plt.plot([0, 1], [0, 1], linestyle="--", color="gray")
-plt.xlabel("False Positive Rate")
-plt.ylabel("True Positive Rate")
-plt.title("ROC Curve (Decision Tree SMOTE)")
-plt.legend()
-plt.grid(True)
-plt.show()
+auc_score = evaluate_binary_classifier(
+    y_test,
+    y_pred,
+    y_prob,
+    confusion_matrix_title="Confusion Matrix (Decision Tree SMOTE)",
+    roc_title="ROC Curve (Decision Tree SMOTE)",
+)
 
 # === 7. Feature Importance ===
 importance_df = pd.DataFrame(
