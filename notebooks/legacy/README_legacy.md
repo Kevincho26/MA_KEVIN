@@ -328,6 +328,43 @@ src/features/__init__.py
 
 This provides a cleaner public surface for the feature-related utilities currently extracted from the legacy notebooks.
 
+### Model helpers
+
+Reusable modeling helpers are now centralized in:
+
+```text
+src/models/
+```
+
+Current model-related modules include:
+
+- `src/models/evaluation.py`
+- `src/models/interpretation.py`
+- `src/models/__init__.py`
+
+Current reusable helpers include:
+
+- `evaluate_binary_classifier()`
+- `prepare_feature_importance_df()`
+- `plot_feature_importance()`
+
+These helpers currently centralize repeated supervised-model notebook logic for:
+
+- binary-classification evaluation outputs
+- confusion matrix and ROC plotting
+- feature-importance dataframe preparation
+- feature-importance plotting and top-feature reporting
+
+### Model exports
+
+Shared model helpers are re-exported through:
+
+```text
+src/models/__init__.py
+```
+
+This provides a cleaner public surface for model-related utilities already extracted from the supervised legacy notebooks.
+
 ---
 
 ## Current migration status
@@ -340,6 +377,8 @@ At this stage, the legacy workflow has already been partially migrated away from
 - canonical processed dataset access in `src/data/loaders.py`
 - selected preprocessing helpers in `src/features/preprocessing.py`
 - initial feature-engineering helpers in `src/features/engineering.py`
+- binary-classification evaluation helpers in `src/models/evaluation.py`
+- feature-importance preparation and plotting helpers in `src/models/interpretation.py`
 
 ### Already applied in legacy notebooks
 
@@ -347,6 +386,8 @@ At this stage, the legacy workflow has already been partially migrated away from
 - several supervised notebooks use shared preprocessing helpers
 - `06_build_association_rules_dataset` uses shared feature-engineering helpers
 - `03_build_supervised_dataset` and `04_build_unsupervised_dataset` use shared ordinal-encoding logic
+- `10_logistic_regression` reuses the shared binary-classification evaluation helper
+- `11_decision_tree`, `12_random_forest`, and `13_xgboost` reuse both shared evaluation and feature-importance helpers
 
 ### Main exception
 
@@ -421,7 +462,7 @@ This phase focused on structure, reuse, and stability of the legacy workflow. Se
 ### Environment dependencies
 
 - `tensorflow` may still be required for `22_autoencoder_anomaly_detection.py`
-- `imblearn` may still be required for `10_logistic_regression.py`
+- `imblearn` may still be required for some supervised notebook variants that use SMOTE
 
 ### Technical cleanup still pending
 
@@ -429,14 +470,15 @@ This phase focused on structure, reuse, and stability of the legacy workflow. Se
 - MKL / OpenMP / clustering warnings on Windows
 - column names with encoding artifacts in some notebooks
 - large notebooks with duplicated experiment sections
-- modeling and evaluation logic still mostly notebook-local
+- training, tuning, and some model-specific visualization logic still mostly notebook-local
 
 ### Architecture still pending
 
-The repository has already started centralizing `src/features`, but there is still room to continue extracting reusable logic into modules such as:
+The repository has already started centralizing `src/features` and `src/models`, but there is still room to continue extracting reusable logic into modules such as:
 
 - `src/models/train.py`
-- `src/models/evaluate.py`
+- `src/models/splitting.py`
+- `src/models/tuning.py`
 
 ---
 
@@ -450,6 +492,7 @@ git log --oneline -10
 git grep -n "pd.get_dummies\|pd.cut\|map(" -- "notebooks/legacy/*.py"
 Get-ChildItem src
 Get-ChildItem src\features
+Get-ChildItem src\models
 ```
 
 ---
@@ -465,6 +508,8 @@ The legacy pipeline is now in a more reusable and portable state in terms of:
 - reusable repository paths
 - reusable dataset loaders
 - reusable preprocessing helpers
-- initial reusable feature-engineering helpers
+- reusable feature-engineering helpers
+- reusable model-evaluation helpers
+- reusable feature-importance helpers
 
 This README documents that updated baseline for future migration work.
