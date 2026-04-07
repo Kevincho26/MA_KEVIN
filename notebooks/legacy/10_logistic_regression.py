@@ -25,6 +25,7 @@ with data processed from 03_build_supervised_dataset.
 import matplotlib.pyplot as plt
 import pandas as pd
 import seaborn as sns
+from IPython.display import display
 
 from src.data.loaders import load_supervised_modeling_dataset
 from src.features.preprocessing import drop_columns_if_present, split_features_and_target
@@ -32,6 +33,7 @@ from src.models.evaluation import evaluate_binary_classifier
 from src.models.interpretation import plot_coefficients, prepare_coefficient_df
 from src.models.splitting import scale_train_test, split_supervised_data
 from src.models.train import train_logistic_regression
+from src.models.tuning import prepare_cv_results_df, tune_logistic_regression_grid_search
 
 # === 2. Load Supervised Modeling Dataset ===
 df = load_supervised_modeling_dataset()
@@ -74,32 +76,55 @@ plot_coefficients(
 )
 
 # %% [markdown]
-# ## 2. Logistic Regression: L1 (Lazo) Penalization
+# ## 2. Logistic Regression: Grid Search Tuning
 
 # %%
-# === 5. Train L1-Regularized Logistic Regression Model ===
-model = train_logistic_regression(
+param_grid = [
+    {
+        "penalty": ["l1"],
+        "solver": ["liblinear"],
+        "C": [0.01, 0.1, 1.0, 10.0],
+    },
+    {
+        "penalty": ["l2"],
+        "solver": ["lbfgs", "liblinear"],
+        "C": [0.01, 0.1, 1.0, 10.0],
+    },
+]
+
+search = tune_logistic_regression_grid_search(
     X_train_scaled,
     y_train,
-    penalty="l1",
-    solver="liblinear",
-    class_weight="balanced",
-    random_state=42,
-    max_iter=1000,
+    param_grid=param_grid,
+    estimator_params={
+        "class_weight": "balanced",
+        "random_state": 42,
+        "max_iter": 1000,
+    },
+    scoring="roc_auc",
+    cv=5,
+    n_jobs=-1,
 )
 
-# === 6. Evaluate Model Performance ===
+print("Best params:", search.best_params_)
+print("Best CV score:", search.best_score_)
+
+cv_results_df = prepare_cv_results_df(search, top_n=10)
+display(cv_results_df[["rank_test_score", "mean_test_score", "std_test_score", "params"]])
+
+model = search.best_estimator_
+
+# === Evaluate tuned model ===
 y_pred = model.predict(X_test_scaled)
 y_prob = model.predict_proba(X_test_scaled)[:, 1]
 auc_score = evaluate_binary_classifier(
     y_test,
     y_pred,
     y_prob,
-    confusion_matrix_title="Confusion Matrix (L1)",
-    roc_title="ROC Curve (L1)",
+    confusion_matrix_title="Confusion Matrix (Grid Search)",
+    roc_title="ROC Curve (Grid Search)",
 )
 
-# === 7. Analyze Coefficients ===
 coef_df = prepare_coefficient_df(X.columns, model.coef_[0])
 plot_coefficients(
     coef_df,
@@ -110,8 +135,7 @@ plot_coefficients(
 # ## 3. Logistic Regression: Weight class penalization
 
 # %%
-# === 5. Train Logistic Regression with Custom Class Weights ===
-custom_weights = {0: 5, 1: 1}  # Increased penalty for class 0
+custom_weights = {0: 5, 1: 1}
 model = train_logistic_regression(
     X_train_scaled,
     y_train,
@@ -120,7 +144,6 @@ model = train_logistic_regression(
     max_iter=1000,
 )
 
-# === 6. Evaluate Model Performance ===
 y_pred = model.predict(X_test_scaled)
 y_prob = model.predict_proba(X_test_scaled)[:, 1]
 auc_score = evaluate_binary_classifier(
@@ -131,7 +154,6 @@ auc_score = evaluate_binary_classifier(
     roc_title="ROC Curve (Custom Weights: 0=5, 1=1)",
 )
 
-# === 7. Analyze Coefficients ===
 coef_df = prepare_coefficient_df(X.columns, model.coef_[0])
 plot_coefficients(
     coef_df,
@@ -144,11 +166,9 @@ plot_coefficients(
 # %%
 from imblearn.over_sampling import SMOTE
 
-# === 5. Apply SMOTE to training data ===
 smote = SMOTE(random_state=42)
 X_train_resampled, y_train_resampled = smote.fit_resample(X_train_scaled, y_train)
 
-# === 6. Train Logistic Regression (No Class Weights) ===
 model = train_logistic_regression(
     X_train_resampled,
     y_train_resampled,
@@ -156,7 +176,6 @@ model = train_logistic_regression(
     max_iter=1000,
 )
 
-# === 7. Evaluate Model Performance ===
 y_pred = model.predict(X_test_scaled)
 y_prob = model.predict_proba(X_test_scaled)[:, 1]
 auc_score = evaluate_binary_classifier(
@@ -167,7 +186,6 @@ auc_score = evaluate_binary_classifier(
     roc_title="ROC Curve (SMOTE)",
 )
 
-# === 8. Analyze Coefficients ===
 coef_df = prepare_coefficient_df(X.columns, model.coef_[0])
 plot_coefficients(
     coef_df,

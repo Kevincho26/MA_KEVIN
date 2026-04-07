@@ -9,6 +9,18 @@
 #       jupytext_version: 1.19.1
 # ---
 
+# %%
+# ---
+# jupyter:
+#   jupytext:
+#     notebook_metadata_filter: jupytext,-kernelspec,-language_info
+#     text_representation:
+#       extension: .py
+#       format_name: percent
+#       format_version: '1.3'
+#       jupytext_version: 1.19.1
+# ---
+
 # %% [markdown]
 # ## 1. Random Forest: Baseline
 
@@ -19,10 +31,10 @@ Random Forest Model (v1 - Basic)
 This version uses a default Random Forest classifier to evaluate base performance without class balancing or resampling.
 """
 
-# === 1. Imports and Setup ===
 import matplotlib.pyplot as plt
 import pandas as pd
 import seaborn as sns
+from IPython.display import display
 
 from src.data.loaders import load_supervised_modeling_dataset
 from src.features.preprocessing import drop_columns_if_present, split_features_and_target
@@ -30,20 +42,17 @@ from src.models.evaluation import evaluate_binary_classifier
 from src.models.interpretation import plot_feature_importance, prepare_feature_importance_df
 from src.models.splitting import split_supervised_data
 from src.models.train import train_random_forest
+from src.models.tuning import prepare_cv_results_df, tune_random_forest_random_search
 
-# === 2. Load Preprocessed Supervised Dataset ===
 df = load_supervised_modeling_dataset()
 
-# === 3. Prepare Features and Target ===
 colinear_vars = ["_δND", "_share_RSE_internal"]
 X, y = split_features_and_target(df, "_Success_qual")
 X = drop_columns_if_present(X, colinear_vars)
 X_train, X_test, y_train, y_test = split_supervised_data(X, y)
 
-# === 4. Train Basic Random Forest ===
 model = train_random_forest(X_train, y_train, random_state=42)
 
-# === 5. Evaluate Performance ===
 y_pred = model.predict(X_test)
 y_prob = model.predict_proba(X_test)[:, 1]
 auc_score = evaluate_binary_classifier(
@@ -54,7 +63,6 @@ auc_score = evaluate_binary_classifier(
     roc_title="ROC Curve (Random Forest Basic)",
 )
 
-# === 6. Feature Importance ===
 importance_df = prepare_feature_importance_df(X.columns, model.feature_importances_)
 plot_feature_importance(
     importance_df,
@@ -62,43 +70,54 @@ plot_feature_importance(
 )
 
 # %% [markdown]
-# ## 2. Random Forest: Class Weight Balanced
+# ## 2. Random Forest: Random Search Tuning
 
 # %%
-# === 2. Load Preprocessed Supervised Dataset ===
-df = load_supervised_modeling_dataset()
+param_distributions = {
+    "n_estimators": [100, 200, 300, 500],
+    "max_depth": [None, 4, 6, 8, 10],
+    "min_samples_split": [2, 4, 6, 10],
+    "min_samples_leaf": [1, 2, 3, 5],
+    "max_features": ["sqrt", "log2", None],
+}
 
-# === 3. Prepare Features and Target ===
-colinear_vars = ["_δND", "_share_RSE_internal"]
-X, y = split_features_and_target(df, "_Success_qual")
-X = drop_columns_if_present(X, colinear_vars)
-X_train, X_test, y_train, y_test = split_supervised_data(X, y)
-
-# === 4. Train Random Forest with Class Weight Balanced ===
-model = train_random_forest(
+search = tune_random_forest_random_search(
     X_train,
     y_train,
+    param_distributions=param_distributions,
+    estimator_params={
+        "random_state": 42,
+        "class_weight": "balanced",
+    },
+    n_iter=20,
+    scoring="roc_auc",
+    cv=5,
+    n_jobs=-1,
     random_state=42,
-    n_estimators=100,
-    class_weight="balanced",
 )
 
-# === 5. Evaluate Performance ===
+print("Best params:", search.best_params_)
+print("Best CV score:", search.best_score_)
+
+cv_results_df = prepare_cv_results_df(search, top_n=10)
+display(cv_results_df[["rank_test_score", "mean_test_score", "std_test_score", "params"]])
+
+model = search.best_estimator_
+
 y_pred = model.predict(X_test)
 y_prob = model.predict_proba(X_test)[:, 1]
 auc_score = evaluate_binary_classifier(
     y_test,
     y_pred,
     y_prob,
-    confusion_matrix_title="Confusion Matrix (Random Forest v2 - Balanced)",
-    roc_title="ROC Curve (Random Forest v2 - Balanced)",
+    confusion_matrix_title="Confusion Matrix (Random Forest Tuned)",
+    roc_title="ROC Curve (Random Forest Tuned)",
 )
 
-# === 6. Feature Importance ===
 importance_df = prepare_feature_importance_df(X.columns, model.feature_importances_)
 plot_feature_importance(
     importance_df,
-    title="Feature Importance (Random Forest v2 - Balanced)",
+    title="Feature Importance (Random Forest Tuned)",
 )
 
 # %% [markdown]
@@ -107,20 +126,16 @@ plot_feature_importance(
 # %%
 from imblearn.over_sampling import SMOTE
 
-# === 2. Load Preprocessed Supervised Dataset ===
 df = load_supervised_modeling_dataset()
 
-# === 3. Prepare Features and Target ===
 colinear_vars = ["_δND", "_share_RSE_internal"]
 X, y = split_features_and_target(df, "_Success_qual")
 X = drop_columns_if_present(X, colinear_vars)
 X_train, X_test, y_train, y_test = split_supervised_data(X, y)
 
-# === 4. Apply SMOTE on Training Data Only ===
 smote = SMOTE(random_state=42)
 X_train_resampled, y_train_resampled = smote.fit_resample(X_train, y_train)
 
-# === 5. Train Random Forest on Resampled Data ===
 model = train_random_forest(
     X_train_resampled,
     y_train_resampled,
@@ -128,7 +143,6 @@ model = train_random_forest(
     n_estimators=100,
 )
 
-# === 6. Evaluate Performance ===
 y_pred = model.predict(X_test)
 y_prob = model.predict_proba(X_test)[:, 1]
 auc_score = evaluate_binary_classifier(
@@ -139,7 +153,6 @@ auc_score = evaluate_binary_classifier(
     roc_title="ROC Curve (Random Forest SMOTE)",
 )
 
-# === 7. Feature Importance ===
 importance_df = prepare_feature_importance_df(X.columns, model.feature_importances_)
 plot_feature_importance(
     importance_df,
@@ -150,22 +163,16 @@ plot_feature_importance(
 # ## 4. Random Forest: SMOTE + Class Weight + Threshold
 
 # %%
-# This version applies SMOTE to oversample the minority class, uses class_weight='balanced' in RandomForestClassifier, and adjusts the decision threshold.
-
-# === 2. Load Preprocessed Supervised Dataset ===
 df = load_supervised_modeling_dataset()
 
-# === 3. Prepare Features and Target ===
 colinear_vars = ["_δND", "_share_RSE_internal"]
 X, y = split_features_and_target(df, "_Success_qual")
 X = drop_columns_if_present(X, colinear_vars)
 X_train, X_test, y_train, y_test = split_supervised_data(X, y)
 
-# === 4. Apply SMOTE on Training Data Only ===
 smote = SMOTE(random_state=42)
 X_train_resampled, y_train_resampled = smote.fit_resample(X_train, y_train)
 
-# === 5. Train Random Forest on Resampled Data with Class Weight ===
 model = train_random_forest(
     X_train_resampled,
     y_train_resampled,
@@ -174,12 +181,10 @@ model = train_random_forest(
     class_weight="balanced",
 )
 
-# === 6. Predict Probabilities and Adjust Threshold ===
 y_prob = model.predict_proba(X_test)[:, 1]
-threshold = 0.6  # lowered to increase sensitivity to class 0
+threshold = 0.6
 y_pred = (y_prob >= threshold).astype(int)
 
-# === 7. Evaluate Performance ===
 auc_score = evaluate_binary_classifier(
     y_test,
     y_pred,
@@ -188,7 +193,6 @@ auc_score = evaluate_binary_classifier(
     roc_title="ROC Curve (Random Forest SMOTE + Class Weight + Threshold)",
 )
 
-# === 8. Feature Importance ===
 importance_df = prepare_feature_importance_df(X.columns, model.feature_importances_)
 plot_feature_importance(
     importance_df,

@@ -12,6 +12,15 @@ from src.models.train import (
     train_random_forest,
     train_xgboost,
 )
+from src.models.tuning import (
+    prepare_cv_results_df,
+    tune_decision_tree_grid_search,
+    tune_estimator_grid_search,
+    tune_estimator_random_search,
+    tune_logistic_regression_grid_search,
+    tune_random_forest_random_search,
+    tune_xgboost_random_search,
+)
 
 __all__ = [
     "evaluate_binary_classifier",
@@ -25,4 +34,11 @@ __all__ = [
     "train_logistic_regression",
     "train_random_forest",
     "train_xgboost",
+    "prepare_cv_results_df",
+    "tune_decision_tree_grid_search",
+    "tune_estimator_grid_search",
+    "tune_estimator_random_search",
+    "tune_logistic_regression_grid_search",
+    "tune_random_forest_random_search",
+    "tune_xgboost_random_search",
 ]
